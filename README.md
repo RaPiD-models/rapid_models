@@ -9,7 +9,7 @@ Python package (Reciprocal Data and Physics models - RaPiD-models) to support mo
 
 ## Quickstart
 ```sh
-$ git clone dnvgl-one@vs-ssh.visualstudio.com:v3/dnvgl-one/GRD%20Maritime/rapid_models
+$ git clone https://github.com/RaPiD-models/rapid_models.git
 $ cd rapid_models
 $ pip install -e .
 $ rapid_models --help
