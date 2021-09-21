@@ -2,6 +2,7 @@ bump2version
 wheel
 watchdog
 flake8
+black
 tox
 coverage
 Sphinx
@@ -10,3 +11,4 @@ sphinx-autoapi
 twine
 Click
 pytest
+pyDOE2
