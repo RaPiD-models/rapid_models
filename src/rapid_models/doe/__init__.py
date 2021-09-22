@@ -10,13 +10,13 @@ def fullfact_with_bounds(LBs, UBs, N_xi):
     between lowerbound and upperbound in a structured (grid-like) way with n_x_i points in
     the i'th-dimension.
 
-    **Parameters:**
-    LBs: list-like 1D, lower bounds of the input space. len(LBs) must equal len(UBs)
-    UBs: list-like 1D, upper bounds of the input space. len(UBs) must equal len(LBs)
-    N_xi: list-like,
+    Args:
+        LBs (list-like, 1D): lower bounds of the input space. len(LBs) must equal len(UBs)
+        UBs (list-like, 1D): upper bounds of the input space. len(UBs) must equal len(LBs)
+        N_xi (list-like, 1D): number of equidistant samples for each xi-dimension
 
-    **Return:**
-    array like [[x_0,...,x_i],...,[x_0_n,...,x_i_n]]
+    Return:
+        fullfact (ndarray): [[x_0,...,x_i],...,[x_0_n,...,x_i_n]]
 
     """
     LBs = np.array(LBs)
@@ -41,8 +41,17 @@ def lhs_with_bounds(nDim, nSamples, LBs, UBs, random_state=None):
     """
     Return a 2D array of corresponding (x, y) values that fill the inputspace
     between lowerbound and upperbound with n points using a Latin-hypercube design.
-    Use random seed 42.
 
+    Args:
+        nDim (int): Number of dimensions
+        nSamples (int): Number of total samples
+        LBs (list-like): 1D, lower bounds of the input space. len(LBs) must equal len(UBs)
+        UBs (list-like): 1D, upper bounds of the input space. len(UBs) must equal len(LBs)
+        random_state (int, RandomState instance or None, default=None):
+            Determines random number generation used to initialize the samples.
+            Pass an int for reproducible results across multiple function calls.
+    Returns:
+        lhs (ndarray): Array of sample points with shape (nSamples, nDim)[[x_0,...,x_i],...,[x_0_n,...,x_i_n]]
     """
     LBs = np.array(LBs)
     UBs = np.array(UBs)
