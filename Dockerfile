@@ -2,11 +2,6 @@ FROM python:3.8-bullseye
 
 RUN apt-get update 
 
-#FROM python:3.8-alpine
-#
-#RUN apk update
-#RUN apk add --no-cache python3 py3-pip
-
 # Install python packages for sphinx build
 RUN python -m pip install --upgrade pip
 
@@ -15,8 +10,6 @@ COPY ./requirements_dev.txt .
 RUN pip install -r requirements_dev.txt
 
 COPY . .
-# COPY docs docs
-# COPY src src
 
 # Build docs to docs/_build
 RUN cd docs
