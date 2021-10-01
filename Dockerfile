@@ -1,31 +1,32 @@
-FROM python:3.8-alpine
+FROM python:3.8-bullseye
 
-RUN apk update
-RUN apk add --no-cache python3 py3-pip
+RUN apt-get update 
+
+#FROM python:3.8-alpine
+#
+#RUN apk update
+#RUN apk add --no-cache python3 py3-pip
 
 # Install python packages for sphinx build
 RUN python -m pip install --upgrade pip
-RUN pip install -r requirements.txt
+
+COPY ./requirements_dev.txt .
+# RUN pip install -r requirements.txt
 RUN pip install -r requirements_dev.txt
 
-#WORKDIR /docs
-# Copy in docs folder for building
-#COPY ./package.json .
-#COPY ./yarn.lock .
-#RUN yarn install
-
-ENV NODE_ENV=production
-
-COPY docs docs
-COPY src src
+COPY . .
+# COPY docs docs
+# COPY src src
 
 # Build docs to docs/_build
-#RUN cd docs
-RUN ./docs/sphinx-apidoc -o . ../src/rapid_models
-RUN ./docs/make html
+RUN cd docs
+RUN sphinx-apidoc -o . ../src/rapid_models
+RUN sphinx-build -M html ./docs ./docs/build
+# RUN make html
 
 # Build package
-RUN python setup.py
+RUN cd ..
+RUN python ./setup.py sdist
 RUN mkdir ./docs/build/html/dist
 RUN mv ./dist/*.tar.gz ./docs/build/html/dist/
 
