@@ -28,7 +28,7 @@ FROM nginx:alpine
 
 WORKDIR /app
 # Copy the static build assets to /app dir
-COPY --from=0 ./docs/build/html/ .
+COPY --from=0 ./docs/build/html/ ./pydocs/
 # Copy in the nginx config file
 COPY nginx.conf /etc/nginx/nginx.conf
 
