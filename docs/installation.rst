@@ -32,7 +32,7 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone dnvgl-one@vs-ssh.visualstudio.com:v3/dnvgl-one/GRD%20Maritime/rapid_models
+    $ git clone https://github.com/RaPiD-models/rapid_models.git
     
 
 Once you have a copy of the source, you can install it with:
@@ -42,4 +42,4 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Git repo: git clone dnvgl-one@vs-ssh.visualstudio.com:v3/dnvgl-one/GRD%20Maritime/rapid_models
+.. _Git repo: git clone https://github.com/RaPiD-models/rapid_models.git
