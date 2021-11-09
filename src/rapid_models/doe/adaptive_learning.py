@@ -11,8 +11,13 @@ def AL_McKay92_idx(gp_std_at_lhs, nNew=1):
     Return index of nNew point with highest standard deviation
 
     Args:
-      gp_std_at_lhs (list-like, 1D): List or array of standard deviation predictions from a Gaussian process (GP) model. The sample size should be a suitably large Latin-hypercube sample (LHS) from the entire valid input range (E.g. $> 100 x n$ where $n$ is the number of input dimensions)
-      nNew (int, default=1): Number of largest values to return. ``nNew = 1`` will return the index of the largest value of the input, while ``nNew = len(gp_std_at_lhs)`` will return a sorted list (decending) of the input values.
+      gp_std_at_lhs (list-like, 1D): List or array of standard deviation
+        predictions from a Gaussian process (GP) model.The sample size should be
+        a suitably large Latin-hypercube sample (LHS) from the entire valid
+        input range (E.g. $> 100 x n$ where $n$ is the number of input
+        dimensions) nNew (int, default=1): Number of largest values to return.
+        ``nNew = 1`` will return the index of the largest value of the input,
+        (decending) of the input values.
 
     Returns:
       idxs (ndarray, 1D): Array of indexes of the nNew largest values in the input.
@@ -35,10 +40,15 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
     Return index of nNew points which gives the largest global variance reduction
 
     Args:
-      kernel_fn (function): Gaussian process (GP) kernel function
-      X_train (array-like, size n x d): The training features $\mathbf{X}$. n is dimension size while d is number of training features.
-      X_lhs (array-like, size n x s): Latin hypercube sample to estimate the improvement metric over.
-      nNew (int, default=1): Number of largest values to return. ``nNew = 1`` will return the index of the largest improvement metric value, while ``nNew = len(X_lhs)`` will return a sorted list (decending) of the estimated improvement metric values.
+      kernel_fn (function): Gaussian process (GP) kernel function X_train
+        (array-like, size n x d): The training features $\\mathbf{X}$. n is
+        dimension size while d is number of training features.
+      X_lhs (array-like, size n x s): Latin hypercube sample to estimate the
+        improvement metric over.
+      nNew (int, default=1): Number of largest values to return. ``nNew = 1``
+        will return the index of the largest improvement metric value, while
+        ``nNew = len(X_lhs)`` will return a sorted list (decending) of the
+        estimated improvement metric values.
 
     Returns:
       idxs (ndarray, 1D): Array of indexes of the nNew largest values in the estimated improvement metric.
@@ -74,11 +84,20 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
 
 
 def dotdot_a_b_aT_for_row_in_a(a, b):
-    """function to calculate row wize dot(dot(a,b),aT) where aT==a.T as in
+    """function for efficient calculation (using einsum) of row-wize
+    dot(dot(a,b),aT) where aT==a.T as in:
+
     tmpval=[]
     for q in range(len(a)):
         tmpval.append( np.dot(np.dot(a[q, :], b), aT[:,q]))
     return np.array(tmpval)
+
+    Args:
+      a (array-like, 2D)
+      b (array-like, 2D)
+
+    Returns:
+      c (ndarray, 2D)
 
     """
     if torch.is_tensor(a) and torch.is_tensor(b):
@@ -89,14 +108,21 @@ def dotdot_a_b_aT_for_row_in_a(a, b):
 
 
 def dotdot_a_b_aT(a, b):
-    """function to calculate row wize dot(dot(a,b),aT) for all combinations
-    of rows in a and cols in aT as in:
+    """function for efficient calculation (using einsum) of row-wize
+    dot(dot(a,b),aT) for all combinations of rows in a and cols in aT as in:
 
     tmpval=[]
     for q in range(len(a)):
         for qq in range(len(a))
             tmpval.append( np.dot(np.dot(a[q, :], b), aT[:,qq]))
     return np.array(tmpval)
+
+    Args:
+      a (array-like, 2D)
+      b (array-like, 2D)
+
+    Returns:
+      c (ndarray, 2D)
 
     """
     if torch.is_tensor(a) and torch.is_tensor(b):
