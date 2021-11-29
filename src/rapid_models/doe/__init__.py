@@ -23,6 +23,8 @@ def fullfact_with_bounds(LBs, UBs, N_xi):
     UBs = np.array(UBs)
     N_xi = np.array(N_xi)
 
+    if len(LBs.shape) > 1 or len(UBs.shape) > 1 or len(N_xi.shape) > 1:
+        raise ValueError("LBs, UBs, N_xi must all be list-like 1D")
     if not LBs.shape == UBs.shape == N_xi.shape:
         raise ValueError("Shape of LBs, UBs, N_xi must be equal")
     if np.any(N_xi < 1):
