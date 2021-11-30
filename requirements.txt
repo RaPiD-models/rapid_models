@@ -1,1 +1,2 @@
 pyDOE2
+torch==1.10.0
