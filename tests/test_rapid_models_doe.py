@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Tests for `rapid_models.doe` package."""
+"""Tests for `rapid_models.doe` module."""
 
 import pytest
 
