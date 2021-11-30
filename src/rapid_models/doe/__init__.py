@@ -55,8 +55,15 @@ def lhs_with_bounds(nDim, nSamples, LBs, UBs, random_state=None):
     Returns:
         lhs (ndarray): Array of sample points with shape (nSamples, nDim)[[x_0,...,x_i],...,[x_0_n,...,x_i_n]]
     """
+
     LBs = np.array(LBs)
     UBs = np.array(UBs)
 
+    if len(LBs.shape) > 1 or len(UBs.shape) > 1:
+        raise ValueError("LBs, UBs must be list-like 1D")
+    if not LBs.shape == UBs.shape == (nDim,):
+        raise ValueError("Shape of LBs, UBs, must be equal and match the (nDim,)")
+
     lhs = pyDOE2.lhs(nDim, samples=nSamples, random_state=random_state)
+
     return LBs + lhs * (UBs - LBs)
