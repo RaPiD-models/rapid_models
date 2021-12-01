@@ -12,3 +12,5 @@ twine
 Click
 pytest
 pyDOE2
+plotly
+sklearn
