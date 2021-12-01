@@ -91,8 +91,8 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
 
 
 def dotdot_a_b_aT_for_row_in_a(a, b):
-    """Function for efficient calculation (using einsum) of row-wize
-    dot(dot(a,b),aT) where aT==a.T as in:
+    """Function for efficient calculation (using either numpy.einsum
+    or torch.einsum) of row-wize dot(dot(a,b),aT) where aT==a.T as in:
 
 
     .. code:: python
@@ -111,6 +111,7 @@ def dotdot_a_b_aT_for_row_in_a(a, b):
       c (ndarray, 2D)
 
     """
+
     if torch.is_tensor(a) and torch.is_tensor(b):
         return torch.einsum("ij,ji->i", torch.einsum("ij,jk", a, b), a.T)
     else:
@@ -119,8 +120,9 @@ def dotdot_a_b_aT_for_row_in_a(a, b):
 
 
 def dotdot_a_b_aT(a, b):
-    """Function for efficient calculation (using einsum) of row-wize
-    dot(dot(a,b),aT) for all combinations of rows in a and cols in aT as in:
+    """Function for efficient calculation (using either numpy.einsum
+    or torch.einsum) of row-wize dot(dot(a,b),aT) for all combinations
+    of rows in a and cols in aT as in:
 
     .. code:: python
 
