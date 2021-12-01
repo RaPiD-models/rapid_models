@@ -70,6 +70,8 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+# Jupyter development prefixed notebooks
+**/dev_*.ipynb
 
 # pyenv
 .python-version
