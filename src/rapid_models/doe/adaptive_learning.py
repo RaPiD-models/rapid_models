@@ -3,6 +3,8 @@
 import torch
 import numpy as np
 
+import warnings
+
 # import scipy as sp
 
 
@@ -29,7 +31,16 @@ def AL_McKay92_idx(gp_std_at_lhs, nNew=1):
     """
     std = gp_std_at_lhs
 
-    # ELD TODO: need test on size of std/lhs to be a meaningful sample size?
+    n_lhs = len(std)
+
+    if n_lhs < 100 or n_lhs < 10 * std.shape[1] or n_lhs < 2 ** std.shape[1]:
+        warnings.warn(
+            "Size of X_lhs might not be sufficiently large. s={} samples are \
+small compared to number of dimensions n={}".format(
+                std.shape[0], std.shape[1]
+            ),
+            UserWarning,
+        )
 
     idxs = np.argpartition(std, -nNew)[-nNew:]
     idxs = idxs[np.argsort(-std[idxs])]
@@ -47,7 +58,7 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
         (array-like, size n x d): The training features $\\mathbf{X}$. n is
         dimension size while d is number of training features.
       X_lhs (array-like, size n x s): Latin hypercube sample to estimate the
-        improvement metric over.
+        improvement metric over. Number of samples s should be sufficiently large.
       nNew (int, default=1): Number of largest values to return. ``nNew = 1``
         will return the index of the largest improvement metric value, while
         ``nNew = len(X_lhs)`` will return a sorted list (decending) of the
@@ -66,7 +77,14 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
     n_train = len(X_train)
     n_lhs = len(X_lhs)
 
-    # ELD TODO: need test on size of std/lhs to be a meaningful sample size?
+    if n_lhs < 100 or n_lhs < 10 * X_lhs.shape[1] or n_lhs < 2 ** X_lhs.shape[1]:
+        warnings.warn(
+            "Size of X_lhs might not be sufficiently large. s={} samples are \
+small compared to number of dimensions n={}".format(
+                X_lhs.shape[0], X_lhs.shape[1]
+            ),
+            UserWarning,
+        )
 
     X_all = np.vstack([X_train, X_lhs])  # OK
 
