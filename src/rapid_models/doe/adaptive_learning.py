@@ -74,6 +74,9 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
 
     """
 
+    if not X_train.shape[1] == X_lhs.shape[1]:
+        raise ValueError("2nd dimension of X_train and X_lhs must be equal")
+
     n_train = len(X_train)
     n_lhs = len(X_lhs)
 
