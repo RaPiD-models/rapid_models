@@ -39,7 +39,7 @@ def fullfact_with_bounds(LBs, UBs, N_xi):
 
 def lhs_with_bounds(nDim, nSamples, LBs, UBs, random_state=None):
     """
-    Return a 2D array of corresponding (x, y) values that fill the inputspace
+    Return a 2D array of corresponding (x, y) values that fill the input space
     between lowerbound and upperbound with n points using a Latin-hypercube design.
 
     Args:
