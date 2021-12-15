@@ -116,7 +116,7 @@ def dotdot_a_b_aT_for_row_in_a(a, b):
     or torch.einsum) of row-wize dot(dot(a,b),aT) where aT==a.T as in:
 
 
-    .. code:: python
+    .. code-block:: python
 
       c=[]
       for q in range(len(a)):
@@ -145,7 +145,7 @@ def dotdot_a_b_aT(a, b):
     or torch.einsum) of row-wize dot(dot(a,b),aT) for all combinations
     of rows in a and cols in aT as in:
 
-    .. code:: python
+    .. code-block:: python
 
       c=[]
       for q in range(len(a)):
