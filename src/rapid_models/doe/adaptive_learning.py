@@ -33,11 +33,11 @@ def AL_McKay92_idx(gp_std_at_lhs, nNew=1):
 
     n_lhs = len(std)
 
-    if n_lhs < 100 or n_lhs < 10 * std.shape[1] or n_lhs < 2 ** std.shape[1]:
+    if n_lhs < 100:
         warnings.warn(
             "Size of X_lhs might not be sufficiently large. s={} samples are \
-small compared to number of dimensions n={}".format(
-                std.shape[0], std.shape[1]
+small".format(
+                n_lhs
             ),
             UserWarning,
         )
