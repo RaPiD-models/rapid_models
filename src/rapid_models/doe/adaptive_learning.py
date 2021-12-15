@@ -16,7 +16,7 @@ def AL_McKay92_idx(gp_std_at_lhs, nNew=1):
       gp_std_at_lhs (list-like, 1D): List or array of standard deviation
         predictions from a Gaussian process (GP) model.The sample size should be
         a suitably large Latin-hypercube sample (LHS) from the entire valid
-        input range (E.g. $> 100 x n$ where $n$ is the number of input
+        input range (E.g. :math:`> 100 \\times n` where :math:`n` is the number of input
         dimensions)
       nNew (int, default=1): Number of largest values to return.
         ``nNew = 1`` will return the index of the largest value of the input,
@@ -54,9 +54,9 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
     Return index of nNew points which gives the largest global variance reduction
 
     Parameters:
-      kernel_fn (function): Gaussian process (GP) kernel function X_train
-        (array-like, size n x d): The training features $\\mathbf{X}$. n is
-        dimension size while d is number of training features.
+      kernel_fn (function): Gaussian process (GP) kernel function
+      X_train (array-like, size n x d): The training features :math:`\mathbf{X}`
+        where n is dimension size while d is number of training features.
       X_lhs (array-like, size n x s): Latin hypercube sample to estimate the
         improvement metric over. Number of samples s should be sufficiently large.
       nNew (int, default=1): Number of largest values to return. ``nNew = 1``
