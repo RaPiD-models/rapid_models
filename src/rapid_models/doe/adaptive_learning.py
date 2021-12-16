@@ -108,7 +108,7 @@ small compared to number of dimensions n={}".format(
     idx = idx[np.argsort(-T_ALCs[idx])]
     Timp = [(T_ALCs[q]) / np.float(n_lhs) for q in idx]
 
-    return idx, Timp  # , T_ALCs
+    return idx, Timp
 
 
 def dotdot_a_b_aT_for_row_in_a(a, b):
