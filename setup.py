@@ -27,7 +27,7 @@ with open("README.md") as readme_file:
 with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-requirements = ["Click>=7.0", "click-log", "pyDOE2", "torch==1.10.0"]
+requirements = ["numpy", "scipy"]
 
 test_requirements = [
     "pytest>=3",
@@ -66,7 +66,8 @@ setup(
     package_dir={"": "src"},
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://dnvgl-one.visualstudio.com/GRD%20Maritime/_git/rapid_models",
+    url="https://github.com/RaPiD-models/rapid_models",
+    download_url = "https://github.com/RaPiD-models/rapid_models/archive/refs/tags/v0.1.4.tar.gz",
     version=get_version("src/rapid_models/__init__.py"),
     zip_safe=False,
 )
