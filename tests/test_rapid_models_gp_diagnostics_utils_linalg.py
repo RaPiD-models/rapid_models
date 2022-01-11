@@ -5,11 +5,13 @@ from rapid_models.gp_diagnostics.utils.linalg import (
     triang_solve,
     mulinv_solve,
     mulinv_solve_rev,
-    symmetrify,
+    # symmetrify,
     chol_inv,
     traceprod,
-    try_chol,
+    # try_chol,
 )
+
+# TODO: implement tests for symmetrify and try_chol
 
 
 def random_matrix(N, M, seed):
