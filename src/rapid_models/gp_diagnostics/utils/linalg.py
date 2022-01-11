@@ -75,7 +75,8 @@ def traceprod(A, B):
     """
     Calculate trace(A*B) for two matrices A and B
     """
-    return np.sum(np.core.umath_tests.inner1d(A, B.T))
+    return np.einsum("ij,ji->", A, B)
+    # return np.sum(np.core.umath_tests.inner1d(A, B.T))
 
 
 def try_chol(K, noise_variance, fun_name):
