@@ -27,7 +27,7 @@ with open("README.md") as readme_file:
 with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-requirements = ["numpy", "scipy"]
+requirements = ["Click>=7.0", "click-log", "pyDOE2", "torch==1.10.0"]
 
 test_requirements = [
     "pytest>=3",
