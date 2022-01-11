@@ -55,7 +55,7 @@ def AL_Cohn96_idx(kernel_fn, X_train, X_lhs, nNew=1):
 
     Parameters:
       kernel_fn (function): Gaussian process (GP) kernel function
-      X_train (array-like, size n x d): The training features :math:`\mathbf{X}`
+      X_train (array-like, size n x d): The training features :math:`\\mathbf{X}`
         where n is dimension size while d is number of training features.
       X_lhs (array-like, size n x s): Latin hypercube sample to estimate the
         improvement metric over. Number of samples s should be sufficiently large.
