@@ -12,8 +12,6 @@ jobs:
       vmImage: ubuntu-latest
     strategy:
       matrix:
-        Python37:
-          python.version: '3.7'
         Python38:
           python.version: '3.8'
     
@@ -25,7 +23,7 @@ jobs:
     
     - script: |
         python -m pip install --upgrade pip
-        # pip install -r requirements.txt
+        pip install -r requirements.txt
         pip install .
       displayName: 'Install dependencies'
 
@@ -46,8 +44,6 @@ jobs:
       vmImage: 'windows-latest'
     strategy:
       matrix:
-        Python37:
-          python.version: '3.7'
         Python38:
           python.version: '3.8'
     steps:
@@ -59,6 +55,7 @@ jobs:
     - script: |
         call activate testenv
         pip install .
+        pip install -r requirements.txt
         pip install -r requirements_dev.txt
         pip install pytest-azurepipelines
         pytest
