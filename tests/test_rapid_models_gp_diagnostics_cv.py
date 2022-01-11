@@ -103,13 +103,13 @@ def test_check_lower_triangular():
         check_lower_triangular(np.array([[1, 2, 2.3], [0, 2.2, 3], [0.1, 0, 4]]))
 
     with pytest.raises(Exception):
-        check_lower_triangular(np.ones(shape=(13, 14))) == False
+        check_lower_triangular(np.ones(shape=(13, 14))) is False
 
     with pytest.raises(Exception):
-        check_lower_triangular(np.array([[1, 2, 2.3], [0, 0.001, "a"]])) == False
+        check_lower_triangular(np.array([[1, 2, 2.3], [0, 0.001, "a"]])) is False
 
     with pytest.raises(Exception):
-        check_lower_triangular("a") == False
+        check_lower_triangular("a") is False
 
 
 def test_check_numeric_array():
