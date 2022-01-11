@@ -1,5 +1,5 @@
 pyDOE2
-torch==1.10.0
-plotly
-ipywidgets>=7.0.0
-sklearn
+numpy
+scipy
+torch>=1.10.0
+gpytorch>=1.6.0
