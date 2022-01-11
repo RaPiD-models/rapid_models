@@ -12,7 +12,8 @@ from rapid_models.gp_diagnostics.utils.linalg import (
 
 def multifold(K, Y_train, folds, noise_variance=0, check_args=True):
     """
-    Compute multifold CV residuals for GP regression with noiseless (noise_variance = 0) or fixed variance iid Gaussian noise.
+    Compute multifold CV residuals for GP regression with noiseless
+    (noise_variance = 0) or fixed variance iid Gaussian noise.
     (residual = observed - predicted)
 
     Args:
@@ -28,7 +29,8 @@ def multifold(K, Y_train, folds, noise_variance=0, check_args=True):
         cov: Covariance of CV residuals
         residuals_transformed: The residuals transformed to the standard normal space
 
-    This function just calls 'multifold_cholesky()' with the appropriate Cholesky factor. It is based on the formulation derived in:
+    This function just calls 'multifold_cholesky()' with the appropriate Cholesky factor.
+    It is based on the formulation derived in:
 
     [D. Ginsbourger and C. Schaerer (2021). Fast calculation of Gaussian Process multiple-fold
     crossvalidation residuals and their covariances. arXiv:2101.03108]
@@ -63,7 +65,8 @@ def multifold(K, Y_train, folds, noise_variance=0, check_args=True):
 
 def multifold_cholesky(L, Y_train, folds, check_args=True):
     """
-    Compute multifold CV residuals from the Cholesky factor L of the observation precision matrix and the training data Y_train
+    Compute multifold CV residuals from the Cholesky factor L of the
+    observation precision matrix and the training data Y_train
     (residual = observed - predicted)
 
     Args:
@@ -83,7 +86,8 @@ def multifold_cholesky(L, Y_train, folds, check_args=True):
     * For observations including Gaussian noise with fixed variance (v), the matrix K is
     K = (K + v*I) where K[i, j] is the prior covariance of the latent GP between the i-th an j-th training location
 
-    This implementation uses the Cholesky factor instead of the inverse precision matrix, but is otherwise equivalent to the formulas derived in
+    This implementation uses the Cholesky factor instead of the inverse precision matrix,
+    but is otherwise equivalent to the formulas derived in
 
     [D. Ginsbourger and C. Schaerer (2021). Fast calculation of Gaussian Process multiple-fold
     crossvalidation residuals and their covariances. arXiv:2101.03108]
@@ -136,7 +140,8 @@ def multifold_cholesky(L, Y_train, folds, check_args=True):
 
 def loo(K, Y_train, noise_variance=0, check_args=True):
     """
-    Compute Leave-One-Out (LOO) residuals for GP regression with noiseless (noise_variance = 0) or fixed variance iid Gaussian noise.
+    Compute Leave-One-Out (LOO) residuals for GP regression with noiseless
+    (noise_variance = 0) or fixed variance iid Gaussian noise.
     (residual = observed - predicted)
     This function just calls 'loo_cholesky()' with the appropriate Cholesky factor.
 
@@ -178,7 +183,8 @@ def loo(K, Y_train, noise_variance=0, check_args=True):
 
 def loo_cholesky(L, Y_train, check_args=True):
     """
-    Compute Leave-One-Out (LOO) residuals from the Cholesky factor L of the observation precision matrix and the training data Y_train
+    Compute Leave-One-Out (LOO) residuals from the Cholesky factor L of the
+    observation precision matrix and the training data Y_train
     (residual = observed - predicted)
 
     Args:
@@ -197,7 +203,8 @@ def loo_cholesky(L, Y_train, check_args=True):
     * For observations including Gaussian noise with fixed variance (v), the matrix K is
     K = (K + v*I) where K[i, j] is the prior covariance of the latent GP between the i-th an j-th training location
 
-    This implementation uses the Cholesky factor instead of the inverse precision matrix, but is otherwise equivalent to the formulas derived in
+    This implementation uses the Cholesky factor instead of the inverse
+    precision matrix, but is otherwise equivalent to the formulas derived in
 
     [O. Dubrule. Cross validation of kriging in a unique neighborhood.
     Journal of the International Association for Mathematical Geology, 15 (6):687-699, 1983.]

@@ -13,9 +13,11 @@ from rapid_models.gp_diagnostics.utils.linalg import triang_solve
 
 def evaluate_GP(K, Y_train, folds=None, noise_variance=0, check_args=True):
     """
-    Compute a set of evaluation metrics for GP regression with noiseless (noise_variance = 0) or fixed variance iid Gaussian noise.
+    Compute a set of evaluation metrics for GP regression with noiseless
+    (noise_variance = 0) or fixed variance iid Gaussian noise.
 
-    Specify the list 'folds' of indices for multifold cross-validation (see documentation for cv.multifold), otherwise leave-one-out is assumed.
+    Specify the list 'folds' of indices for multifold cross-validation (see
+    documentation for cv.multifold), otherwise leave-one-out is assumed.
 
     Args:
         K (2d array): GP prior covariance matrix
@@ -27,7 +29,9 @@ def evaluate_GP(K, Y_train, folds=None, noise_variance=0, check_args=True):
 
     Returns: a dict containing
         log_marginal_likelihood: The log probability of Y_train
-        log_pseudo_likelihood: The log 'pseudo' likelihood is the sum of the log probabilities of each observation during cross-validation in the standard normal space
+        log_pseudo_likelihood: The log 'pseudo' likelihood is the sum of the
+        log probabilities of each observation during cross-validation in the
+        standard normal space
         RMSE: The root mean squared error obtained by using the GP posterior mean as a deterministic prediction
 
         (The residuals are also returned, for plotting and to check for normality)
@@ -94,7 +98,8 @@ def evaluate_GP_cholesky(L, Y_train, folds=None, check_args=True):
     res["log_marginal_likelihood"] = log_prob_normal(L, Y_train)
 
     # Compute log pseudo likelihood - This is the log probability of the residuals in the standard normal space
-    # The sum of log probabilities of each observation in Y_train in the posterior GP, assuming that the corresponding fold has been left out,
+    # The sum of log probabilities of each observation in Y_train in the
+    # posterior GP, assuming that the corresponding fold has been left out,
     # can be obtained by adding -0.5*log(det(cov)) = -log(chol(cov).diagonal()).sum() to res['log_pseudo_likelihood']
     res["log_pseudo_likelihood"] = log_prob_standard_normal(residuals_transformed)
 

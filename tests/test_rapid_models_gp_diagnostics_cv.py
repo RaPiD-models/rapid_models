@@ -505,7 +505,8 @@ def generate_cv_data(
         FOLDS_INDICES = [[i] for i in range(N_TRAIN)]
 
     else:
-        # This sampling will not work if NUM_FOLDS is very big (wrt N_TRAIN), but we will only use it for some examples where NUM_FOLDS << N_TRAIN
+        # This sampling will not work if NUM_FOLDS is very big (wrt N_TRAIN),
+        # but we will only use it for some examples where NUM_FOLDS << N_TRAIN
         folds_end = np.random.multinomial(
             N_TRAIN, np.ones(NUM_FOLDS) / NUM_FOLDS, size=1
         )[
