@@ -5,13 +5,13 @@ from rapid_models.gp_diagnostics.utils.linalg import (
     triang_solve,
     mulinv_solve,
     mulinv_solve_rev,
-    # symmetrify,
+    symmetrify,
     chol_inv,
     traceprod,
     # try_chol,
 )
 
-# TODO: implement tests for symmetrify and try_chol
+# TODO: if we keep try_col, implement a test for it
 
 
 def random_matrix(N, M, seed):
@@ -28,6 +28,20 @@ def random_lower_triang_matrix(N, seed):
     """
     tmp = random_matrix(N, N, seed)
     return np.linalg.cholesky(tmp.dot(tmp.T))
+
+
+def test_symmetrify():
+    N = 10
+
+    A = random_lower_triang_matrix(N, 77)
+    symmetrify(A, upper=False)
+    
+    assert np.allclose(A - A.T, np.zeros((N, N)))
+
+    A = random_lower_triang_matrix(N, 77)
+    symmetrify(A.T, upper=True)
+    
+    assert np.allclose(A - A.T, np.zeros((N, N)))
 
 
 def test_triang_solve():
