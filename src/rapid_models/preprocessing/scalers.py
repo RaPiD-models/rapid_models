@@ -1,5 +1,6 @@
 """Convenience scaling functions for rapid-models.
-For more scaling functions refer to e.g. https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing"""
+  For more scaling functions refer to e.g.
+  https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing"""
 
 
 def scale_x_to_box(x, bounds):
@@ -35,11 +36,19 @@ def standardScaler(
 
     Args:
       x (array-like, ND): Array of features to be scaled.
-      mean (float, default=None): Specify the mean that will be subtracted from the features in $x$. If _None_, the mean will be calculated from the features as mean=x.mean().
-      std (float, default=None): Specify the std that the features in $x$ will be scaled by. If _None_, the std will be calculated from the features as std=x.std() (unbiased).
-      dim (int or tuple of python:ints, defalt=0): The dimension or dimensions to reduce to establish the mean and std if these are _None_.
-      tensorType (str, default=torch): Specify if torch. or numpy. functions are used.
-      bReturnParam (bool, default=False): Specify if the function should return the mean and std used in the scaling. Should be _True_ if mean and std is _None_ to retain the parameters.
+      mean (float, default=None): Specify the mean that will be subtracted from
+        the features in $x$. If _None_, the mean will be calculated from the
+        features as mean=x.mean().
+      std (float, default=None): Specify the std that the features in $x$ will
+        be scaled by. If _None_, the std will be calculated from the features
+        as std=x.std() (unbiased).
+      dim (int or tuple of python:ints, defalt=0): The dimension or dimensions
+        to reduce to establish the mean and std if these are _None_.
+      tensorType (str, default=torch): Specify if torch. or numpy. functions
+        are used.
+      bReturnParam (bool, default=False): Specify if the function should return
+        the mean and std used in the scaling. Should be _True_ if mean and std
+        is _None_ to retain the parameters.
 
     Returns:
       x_out (array-like, ND): Scaled features.
@@ -70,8 +79,10 @@ def standardReScaler(x, mean, std):
 
     Args:
       x (array-like, ND): Array of features to be rescaled.
-      mean (float, default=None): Specify the mean that will be added to the features in $x$ after rescaling.
-      std (float, default=None): Specify the std that the features in $x$ will be rescaled by.
+      mean (float, default=None): Specify the mean that will be added to the
+        features in $x$ after rescaling.
+      std (float, default=None): Specify the std that the features in $x$ will
+        be rescaled by.
 
     Returns:
       x_out (array-like, ND): Re-scaled features.
