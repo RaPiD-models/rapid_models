@@ -58,25 +58,3 @@ def gpytorch_likelihood_gaussian(variance, variance_lb=1e-6, fixed=True):
     likelihood.requires_grad = not fixed
 
     return likelihood
-
-
-def scale_x_to_box(x, bounds):
-    """
-    Input x = points in [0, 1]^n
-    output scaled to lie in the box given by bounds
-    """
-    x_tmp = x.copy()
-    for i in range(x.shape[1]):
-        x_tmp[:, i] = x_tmp[:, i] * (bounds[i][1] - bounds[i][0]) + bounds[i][0]
-
-    return x_tmp
-
-
-def scale_x_to_box_inv(x, bounds):
-    """
-    Inverse of scale_x_to_box
-    """
-    x_tmp = x.copy()
-    for i in range(x.shape[1]):
-        x_tmp[:, i] = (x_tmp[:, i] - bounds[i][0]) / (bounds[i][1] - bounds[i][0])
-    return x_tmp
