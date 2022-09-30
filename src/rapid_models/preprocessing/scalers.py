@@ -57,7 +57,7 @@ def standardScaler(
     """
 
     if mean is None and std is None:
-        if tensorType.lower == "torch":
+        if tensorType.lower() == "torch":
             mean = x.mean(dim, keepdim=True)
             std = x.std(dim, unbiased=False, keepdim=True)
         else:
