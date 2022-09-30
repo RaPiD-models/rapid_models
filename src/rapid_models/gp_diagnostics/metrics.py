@@ -104,7 +104,17 @@ def evaluate_GP_cholesky(L, Y_train, folds=None, check_args=True):
     res["log_pseudo_likelihood"] = log_prob_standard_normal(residuals_transformed)
 
     # Compute MSE
-    res["MSE"] = np.linalg.norm(mean)
+    res["MSE"] = np.linalg.norm(mean) ** 2 / len(mean)
+    # Compute RMSE
+    res["RMSE"] = res["MSE"] ** 0.5
+
+    # Compute R2-score
+    res["r2-score"] = (
+        1
+        - np.linalg.norm(mean) ** 2 / (np.linalg.norm(Y_train - np.mean(Y_train))) ** 2
+    )
+
+    # ELD TODO: refactor: move metrics in own function
 
     # Append residuals
     res["residuals_mean"] = mean
