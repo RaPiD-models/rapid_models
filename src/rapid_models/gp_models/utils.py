@@ -19,11 +19,15 @@ def optim_step(model, loss_function, optimizer):
     return loss.item()
 
 
-def gpytorch_kernel_Matern(var, ls, nu=2.5):
+def gpytorch_kernel_Matern(
+    var, ls, nu=2.5, lengthscale_constraint=gpytorch.constraints.Positive()
+):
     """
     Return a Matern kernel with specified kernel variance (var) and lengthscales (ls)
     """
-    ker_mat = gpytorch.kernels.MaternKernel(nu=nu, ard_num_dims=len(ls))
+    ker_mat = gpytorch.kernels.MaternKernel(
+        nu=nu, ard_num_dims=len(ls), lengthscale_constraint=lengthscale_constraint
+    )
     ker_mat.lengthscale = ls
     ker = gpytorch.kernels.ScaleKernel(ker_mat)
     ker.outputscale = var
