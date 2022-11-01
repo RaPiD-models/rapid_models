@@ -65,8 +65,8 @@ def gpytorch_mean_constant(val: float,
 
 
 def gpytorch_likelihood_gaussian(
-        variance: torch.Tensor,
-        variance_lb: Union[float, torch.Tensor] = 1e-6,
+        variance: float,
+        variance_lb: float = 1e-6,
         fixed: bool = True) -> gpytorch.likelihoods.Likelihood:
     """
     Return a Gaussian likelihood
@@ -77,10 +77,10 @@ def gpytorch_likelihood_gaussian(
     likelihood = gpytorch.likelihoods.GaussianLikelihood(
         noise_constraint=gpytorch.constraints.GreaterThan(variance_lb))
     likelihood.initialize(noise=variance)
-    # @TODO: Base type of likelihood is gpytorch.Module, not torch.Tensor
+    # @TODO: Base type of likelihood is gpytorch.Module, not torch.Tensor .
     #        Natively, hence, likelihood does not have an attribute 'requires_grad'.
-    #        What the following line effectively does is to dynamically
-    #        add an attribute with name='requires_grad' to likelihood and assign it a boolean value.
+    #        What the following code effectively does is to dynamically
+    #        add an attribute with name='requires_grad' to the likelihood instance and assign this attribute a boolean value.
     #        @AGRE / @ELD: Is this really what you intended, and is it necessary?
     #        CLAROS, 2022-11-01
     likelihood.requires_grad = not fixed
