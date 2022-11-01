@@ -28,29 +28,29 @@ def optim_step(model, loss_function, optimizer):
 
 
 def gpytorch_kernel_Matern(
-    var: torch.Tensor,
-    ls: torch.Tensor,
+    outputscale: float,
+    lengthscale: torch.Tensor,
     nu: float = 2.5,
     lengthscale_constraint: Union[gpytorch.constraints.Interval, None] = None
 ) -> gpytorch.kernels.Kernel:
     """
-    Return a Matern kernel with specified kernel variance (var) and lengthscales (ls)
+    Return a scaled Matern kernel with specified output scale and lengthscale
     """
     lengthscale_constraint = lengthscale_constraint or gpytorch.constraints.Positive(
     )
     ker_mat = gpytorch.kernels.MaternKernel(
         nu=nu,
-        ard_num_dims=len(ls),
+        ard_num_dims=len(lengthscale),
         lengthscale_constraint=lengthscale_constraint)
-    ker_mat.lengthscale = ls
+    ker_mat.lengthscale = lengthscale
     ker = gpytorch.kernels.ScaleKernel(ker_mat)
-    ker.outputscale = var
+    ker.outputscale = outputscale
 
     return ker
 
 
 def gpytorch_mean_constant(val: float,
-                           fixed: bool = True) -> gpytorch.means.ConstantMean:
+                           fixed: bool = True) -> gpytorch.means.Mean:
     """
     Return a constant mean function
 
