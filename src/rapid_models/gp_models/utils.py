@@ -80,7 +80,7 @@ def gpytorch_likelihood_gaussian(
     # @TODO: Base type of likelihood is gpytorch.Module, not torch.Tensor .
     #        Natively, hence, likelihood does not have an attribute 'requires_grad'.
     #        What the following code effectively does is to dynamically
-    #        add an attribute with name='requires_grad' to the likelihood instance and assign this attribute a boolean value.
+    #        add an attribute with name='requires_grad' to the likelihood instance and assign it a boolean value.
     #        @AGRE / @ELD: Is this really what you intended, and is it necessary?
     #        CLAROS, 2022-11-01
     likelihood.requires_grad = not fixed
