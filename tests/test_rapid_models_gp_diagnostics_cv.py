@@ -462,7 +462,8 @@ def generate_cv_data(
 ) -> Tuple[NDArray[Shape['N_TRAIN'], Float],  # noqa: F821 residual means
            NDArray[Shape['N_TRAIN'], Float],  # noqa: F821 residual variances
            List[List[int]],  # folds indices
-           NDArray[Shape['N, N'], Float],  # noqa: F821 covariance matrix
+           NDArray[Shape['N_TRAIN, N_TRAIN'],
+                   Float],  # noqa: F821 covariance matrix
            torch.Tensor,  # X_train  shape=(N_TRAIN, N_DIM)
            torch.Tensor  # Y_train  shape=(N_TRAIN)
            ]:
@@ -490,16 +491,21 @@ def generate_cv_data(
         ])
 
     # Define kernel and sample training data
+
+    # Kernel
     ker: gpytorch.kernels.Kernel = gputils.gpytorch_kernel_Matern(
         outputscale=KER_SCALE_TRUE,
         lengthscale=KER_LENGTHSCALE_TRUE,
     )
+    # Covariance matrix; shape=(N_TRAIN, N_TRAIN)
     K: gpytorch.lazy.LazyEvaluatedKernelTensor = ker(X_train)  # type: ignore
+    # Distribution
     normal_rv: gpytorch.distributions.Distribution = gpytorch.distributions.MultivariateNormal(
         mean=torch.zeros(N_TRAIN),
         covariance_matrix=K,
     )
 
+    # Noise
     noise: Union[float, torch.Tensor] = 0.0
     if NOISE_VAR != 0.0:
         _noise_rv = gpytorch.distributions.MultivariateNormal(
@@ -508,6 +514,7 @@ def generate_cv_data(
         )
         noise = _noise_rv.sample()
 
+    # Sample training data
     Y_train: torch.Tensor = normal_rv.sample() + noise
 
     # Create a list of index subsets
