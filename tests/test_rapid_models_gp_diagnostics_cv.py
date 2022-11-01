@@ -459,12 +459,12 @@ def generate_cv_data(
     NUM_FOLDS: int = 8,
     NOISE_VAR: float = 0.0,
     SCRAMBLE: bool = True,
-) -> Tuple[NDArray[Shape['N'], Float],  # noqa: F821 residual means
-           NDArray[Shape['N'], Float],  # noqa: F821 residual variances
+) -> Tuple[NDArray[Shape['N_TRAIN'], Float],  # noqa: F821 residual means
+           NDArray[Shape['N_TRAIN'], Float],  # noqa: F821 residual variances
            List[List[int]],  # folds indices
            NDArray[Shape['N, N'], Float],  # noqa: F821 covariance matrix
-           torch.Tensor,  # X_train
-           torch.Tensor  # Y_train
+           torch.Tensor,  # X_train  shape=(N_TRAIN, N_DIM)
+           torch.Tensor  # Y_train  shape=(N_TRAIN)
            ]:
     """
     Generate some cross validation data manually for testing
@@ -518,14 +518,14 @@ def generate_cv_data(
         # Note: The following sampling approach will not work if NUM_FOLDS is very big (wrt N_TRAIN),
         # but we will only use it for some examples where NUM_FOLDS << N_TRAIN
 
-        folds_end: NDArray[Shape['*'], Int]  # noqa: F722
+        folds_end: NDArray[Shape['NUM_FOLDS'], Int]  # noqa: F722
         folds_end = np.random.multinomial(
             N_TRAIN,
             np.ones(NUM_FOLDS) / NUM_FOLDS,
             size=1,
         )[0].cumsum()  # last index of each fold
 
-        folds_startstop: NDArray[Shape['*'], Int]  # noqa: F722
+        folds_startstop: NDArray[Shape['NUM_FOLDS_plus_1'], Int]  # noqa: F821
         folds_startstop = np.insert(folds_end, 0, 0, axis=0)
 
         FOLDS_INDICES = [
@@ -580,8 +580,8 @@ def generate_cv_data(
         _residual_vars.append(v.numpy())
 
     # Concatenate and sort so that the residuals correspond to observation 1, 2, 3 etc.
-    cv_residual_means: NDArray[Shape['N'], Float]  # noqa: F821
-    cv_residual_vars: NDArray[Shape['N'], Float]  # noqa: F821
+    cv_residual_means: NDArray[Shape['N_TRAIN'], Float]  # noqa: F821
+    cv_residual_vars: NDArray[Shape['N_TRAIN'], Float]  # noqa: F821
     cv_residual_means = np.array(_residual_means).flatten()
     cv_residual_vars = np.array(_residual_vars).flatten()
     if NUM_FOLDS != N_TRAIN:
@@ -603,7 +603,12 @@ def generate_cv_data(
     )
 
 
-def multitest_loo(N_DIM, N_TRAIN, NOISE_VAR, N_DUPLICATE_X):
+def multitest_loo(
+    N_DIM: int,
+    N_TRAIN: int,
+    NOISE_VAR: float,
+    N_DUPLICATE_X: int,
+):
     """
     Used for running multiple tests of loo()
 
@@ -613,9 +618,13 @@ def multitest_loo(N_DIM, N_TRAIN, NOISE_VAR, N_DUPLICATE_X):
 
     # Generate residuals
     cv_residual_means, cv_residual_vars, folds, K, X_train, Y_train = generate_cv_data(
-        N_DIM, N_TRAIN, N_DUPLICATE_X, N_TRAIN, NOISE_VAR, False)
-    cv_residual_means = np.array(cv_residual_means).flatten()
-    cv_residual_vars = np.array(cv_residual_vars).flatten()
+        N_DIM,
+        N_TRAIN,
+        N_DUPLICATE_X,
+        N_TRAIN,
+        NOISE_VAR,
+        SCRAMBLE=False,
+    )
 
     # Compute residuals from cholesky factor incl jitter
     LOO_mean, LOO_cov, LOO_residuals_transformed = loo(
@@ -659,8 +668,14 @@ def test_loo_noise_dupl():
     multitest_loo(N_DIM=3, N_TRAIN=50, NOISE_VAR=0.3, N_DUPLICATE_X=30)
 
 
-def multitest_multifold(N_DIM, N_TRAIN, NUM_FOLDS, NOISE_VAR, N_DUPLICATE_X,
-                        SCRABMLE):
+def multitest_multifold(
+    N_DIM: int,
+    N_TRAIN: int,
+    NUM_FOLDS: int,
+    NOISE_VAR: float,
+    N_DUPLICATE_X: int,
+    SCRAMBLE: bool,
+):
     """
     Used for running multiple tests of multifold()
 
@@ -670,7 +685,13 @@ def multitest_multifold(N_DIM, N_TRAIN, NUM_FOLDS, NOISE_VAR, N_DUPLICATE_X,
 
     # Generate residuals
     cv_residual_means, cv_residual_vars, folds, K, X_train, Y_train = generate_cv_data(
-        N_DIM, N_TRAIN, N_DUPLICATE_X, NUM_FOLDS, NOISE_VAR, SCRABMLE)
+        N_DIM,
+        N_TRAIN,
+        N_DUPLICATE_X,
+        NUM_FOLDS,
+        NOISE_VAR,
+        SCRAMBLE,
+    )
 
     # Compute residuals from cholesky factor incl jitter
     CV_mean, CV_cov, CV_residuals_transformed = multifold(
@@ -699,7 +720,7 @@ def test_multifold_noiseless():
                         NUM_FOLDS=8,
                         NOISE_VAR=0,
                         N_DUPLICATE_X=0,
-                        SCRABMLE=True)
+                        SCRAMBLE=True)
 
 
 def test_multifold_noise():
@@ -713,7 +734,7 @@ def test_multifold_noise():
                         NUM_FOLDS=8,
                         NOISE_VAR=0.3,
                         N_DUPLICATE_X=0,
-                        SCRABMLE=True)
+                        SCRAMBLE=True)
 
 
 def test_multifold_noise_dupl():
@@ -728,7 +749,7 @@ def test_multifold_noise_dupl():
         NUM_FOLDS=8,
         NOISE_VAR=0.3,
         N_DUPLICATE_X=30,
-        SCRABMLE=True,
+        SCRAMBLE=True,
     )
 
 
