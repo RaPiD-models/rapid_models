@@ -1,9 +1,11 @@
 import random
+from typing import Any, List, Tuple, Union
 
 import gpytorch
 import numpy as np
 import pytest
 import torch
+from nptyping import Float, Int, NDArray, Shape
 
 import rapid_models.gp_models.utils as gputils
 from rapid_models.gp_diagnostics.cv import (check_folds_indices,
@@ -104,14 +106,13 @@ def test_check_lower_triangular():
             np.array([[1, 2, 2.3], [0, 2.2, 3], [0.1, 0, 4]]))
 
     with pytest.raises(Exception):
-        check_lower_triangular(np.ones(shape=(13, 14))) is False
+        check_lower_triangular(np.ones(shape=(13, 14)))
 
     with pytest.raises(Exception):
-        check_lower_triangular(np.array([[1, 2, 2.3], [0, 0.001, "a"]
-                                         ])) is False
+        check_lower_triangular(np.array([[1, 2, 2.3], [0, 0.001, 'a']]))
 
     with pytest.raises(Exception):
-        check_lower_triangular("a") is False
+        check_lower_triangular('a')
 
 
 def test_check_numeric_array():
@@ -134,7 +135,7 @@ def test_check_numeric_array():
         check_numeric_array(np.ones(shape=(2, 4)), 1)
 
     with pytest.raises(Exception):
-        check_numeric_array("a", 1)
+        check_numeric_array('a', 1)
 
     with pytest.raises(Exception):
         check_numeric_array(np.array([1, "1"]), 1)
@@ -451,12 +452,20 @@ def test_loo_1d():
                        atol=1e-3)
 
 
-def generate_cv_data(N_DIM=3,
-                     N_TRAIN=100,
-                     N_DUPLICATE_X=0,
-                     NUM_FOLDS=8,
-                     NOISE_VAR=0,
-                     SCRAMBLE=True):
+def generate_cv_data(
+    N_DIM: int = 3,
+    N_TRAIN: int = 100,
+    N_DUPLICATE_X: int = 0,
+    NUM_FOLDS: int = 8,
+    NOISE_VAR: float = 0.0,
+    SCRAMBLE: bool = True,
+) -> Tuple[NDArray[Shape['N'], Float],  # noqa: F821 residual means
+           NDArray[Shape['N'], Float],  # noqa: F821 residual variances
+           List[List[int]],  # folds indices
+           NDArray[Shape['N, N'], Float],  # noqa: F821 covariance matrix
+           torch.Tensor,  # X_train
+           torch.Tensor  # Y_train
+           ]:
     """
     Generate some cross validation data manually for testing
     """
@@ -467,11 +476,11 @@ def generate_cv_data(N_DIM=3,
     np.random.seed(42)
 
     # Will generate data using a zero-mean Matern 5/2 GP with these parameters
-    KER_SCALE_TRUE = 1.0
-    KER_LENGTHSCALE_TRUE = torch.ones(N_DIM) * 0.5
+    KER_SCALE_TRUE: float = 1.0
+    KER_LENGTHSCALE_TRUE: torch.Tensor = torch.ones(N_DIM) * 0.5
 
     # Generate N_TRAIN training Xs, with N_DUPLICATE_X duplicates
-    X_train = torch.rand(size=(N_TRAIN - N_DUPLICATE_X, N_DIM))
+    X_train: torch.Tensor = torch.rand(size=(N_TRAIN - N_DUPLICATE_X, N_DIM))
 
     if N_DUPLICATE_X > 0:
         X_train = torch.cat([
@@ -481,83 +490,100 @@ def generate_cv_data(N_DIM=3,
         ])
 
     # Define kernel and sample training data
-    ker = gputils.gpytorch_kernel_Matern(KER_SCALE_TRUE, KER_LENGTHSCALE_TRUE)
-    K = ker(X_train)
-    normal_rv = gpytorch.distributions.MultivariateNormal(
-        mean=torch.zeros(N_TRAIN), covariance_matrix=K)
+    ker: gpytorch.kernels.Kernel = gputils.gpytorch_kernel_Matern(
+        outputscale=KER_SCALE_TRUE,
+        lengthscale=KER_LENGTHSCALE_TRUE,
+    )
+    K: gpytorch.lazy.LazyEvaluatedKernelTensor = ker(X_train)  # type: ignore
+    normal_rv: gpytorch.distributions.Distribution = gpytorch.distributions.MultivariateNormal(
+        mean=torch.zeros(N_TRAIN),
+        covariance_matrix=K,
+    )
 
-    if NOISE_VAR == 0:
-        noise = 0
-    else:
-        noise_rv = gpytorch.distributions.MultivariateNormal(
+    noise: Union[float, torch.Tensor] = 0.0
+    if NOISE_VAR != 0.0:
+        _noise_rv = gpytorch.distributions.MultivariateNormal(
             mean=torch.zeros(N_TRAIN),
-            covariance_matrix=torch.eye(N_TRAIN) * NOISE_VAR)
-        noise = noise_rv.sample()
+            covariance_matrix=torch.eye(N_TRAIN) * NOISE_VAR,
+        )
+        noise = _noise_rv.sample()
 
-    Y_train = normal_rv.sample() + noise
+    Y_train: torch.Tensor = normal_rv.sample() + noise
 
     # Create a list of index subsets
+    FOLDS_INDICES: List[List[int]]
     if NUM_FOLDS == N_TRAIN:
         FOLDS_INDICES = [[i] for i in range(N_TRAIN)]
-
     else:
-        # This sampling will not work if NUM_FOLDS is very big (wrt N_TRAIN),
+        # Note: The following sampling approach will not work if NUM_FOLDS is very big (wrt N_TRAIN),
         # but we will only use it for some examples where NUM_FOLDS << N_TRAIN
+
+        folds_end: NDArray[Shape['*'], Int]  # noqa: F722
         folds_end = np.random.multinomial(
-            N_TRAIN, np.ones(NUM_FOLDS) / NUM_FOLDS,
-            size=1)[0].cumsum()  # last index of each fold
+            N_TRAIN,
+            np.ones(NUM_FOLDS) / NUM_FOLDS,
+            size=1,
+        )[0].cumsum()  # last index of each fold
+
+        folds_startstop: NDArray[Shape['*'], Int]  # noqa: F722
         folds_startstop = np.insert(folds_end, 0, 0, axis=0)
+
         FOLDS_INDICES = [
             list(range(folds_startstop[i], folds_startstop[i + 1]))
             for i in range(NUM_FOLDS)
         ]
 
     if SCRAMBLE:
-        rnd_idx = np.random.permutation(N_TRAIN)  # Randomized indices
-        FOLDS_INDICES = [list(rnd_idx[idx]) for idx in FOLDS_INDICES]
+        _rnd_idx = np.random.permutation(N_TRAIN)  # Randomized indices
+        FOLDS_INDICES = [list(_rnd_idx[idx]) for idx in FOLDS_INDICES]
 
     check_folds_indices(FOLDS_INDICES, N_TRAIN)
 
     # Define GP model
-    gp_lik_var = max(1e-6, NOISE_VAR)
-    model = ExactGPModel(
+    _mean: gpytorch.means.Mean = gputils.gpytorch_mean_constant(
+        0.0,
+        fixed=True,
+    )
+    _likelihood: gpytorch.likelihoods.Likelihood = gputils.gpytorch_likelihood_gaussian(
+        variance=max(1e-6, NOISE_VAR),
+        fixed=False,
+    )
+    model: ExactGPModel = ExactGPModel(
         X_train,
         Y_train,  # Training data
-        gputils.gpytorch_mean_constant(0.0, fixed=True),  # Mean function
+        _mean,  # Mean function
         ker,  # Kernel
-        gputils.gpytorch_likelihood_gaussian(variance=gp_lik_var,
-                                             fixed=False),  # Likelihood
-        "",
-        "",
-    )  # Name and path for save/load
+        _likelihood,  # Likelihood
+        '',  # Name and path for save/load
+        '',
+    )
 
     # Run CV manually
     model.eval_mode()
-    cv_residual_means = []  # Residual (observed - predicted) mean
-    cv_residual_vars = []  # Residual (observed - predicted) variance
-
+    # Collect residual means and variances of all folds (residual = observed - predicted)
+    _residual_means: List[NDArray[Any, Float]] = []
+    _residual_vars: List[NDArray[Any, Float]] = []
     for i in range(NUM_FOLDS):
-
         # Split on i-th fold
         fold_X_test, fold_X_train = split_test_train_fold(
             FOLDS_INDICES, X_train, i)
         fold_Y_test, fold_Y_train = split_test_train_fold(
             FOLDS_INDICES, Y_train, i)
-
         # Set training data
         model.set_train_data(inputs=fold_X_train,
                              targets=fold_Y_train,
                              strict=False)
-
         # Predict on test data
         m, v = model.predict(fold_X_test, latent=False)
-
-        cv_residual_means.append((fold_Y_test - m).numpy())
-        cv_residual_vars.append(v.numpy())
+        #
+        _residual_means.append((fold_Y_test - m).numpy())
+        _residual_vars.append(v.numpy())
 
     # Concatenate and sort so that the residuals correspond to observation 1, 2, 3 etc.
-    cv_residual_means = np.array(cv_residual_means).flatten()
-    cv_residual_vars = np.array(cv_residual_vars).flatten()
+    cv_residual_means: NDArray[Shape['N'], Float]  # noqa: F821
+    cv_residual_vars: NDArray[Shape['N'], Float]  # noqa: F821
+    cv_residual_means = np.array(_residual_means).flatten()
+    cv_residual_vars = np.array(_residual_vars).flatten()
     if NUM_FOLDS != N_TRAIN:
         cv_residual_means = np.concatenate(cv_residual_means)
         cv_residual_vars = np.concatenate(cv_residual_vars)
@@ -592,9 +618,13 @@ def multitest_loo(N_DIM, N_TRAIN, NOISE_VAR, N_DUPLICATE_X):
     cv_residual_vars = np.array(cv_residual_vars).flatten()
 
     # Compute residuals from cholesky factor incl jitter
-    gp_lik_var = max(1e-6, NOISE_VAR)
-    LOO_mean, LOO_cov, LOO_residuals_transformed = loo(K, Y_train.numpy(),
-                                                       gp_lik_var)
+    LOO_mean, LOO_cov, LOO_residuals_transformed = loo(
+        K,
+        Y_train.numpy(),
+        noise_variance=max(1e-6, NOISE_VAR),
+    )
+    assert LOO_mean is not None
+    assert LOO_cov is not None
     LOO_var = LOO_cov.diagonal()
 
     # Check
@@ -643,9 +673,14 @@ def multitest_multifold(N_DIM, N_TRAIN, NUM_FOLDS, NOISE_VAR, N_DUPLICATE_X,
         N_DIM, N_TRAIN, N_DUPLICATE_X, NUM_FOLDS, NOISE_VAR, SCRABMLE)
 
     # Compute residuals from cholesky factor incl jitter
-    gp_lik_var = max(1e-6, NOISE_VAR)
     CV_mean, CV_cov, CV_residuals_transformed = multifold(
-        K, Y_train.numpy(), folds, gp_lik_var)
+        K,
+        Y_train.numpy(),
+        folds,
+        noise_variance=max(1e-6, NOISE_VAR),
+    )
+    assert CV_mean is not None
+    assert CV_cov is not None
     CV_var = CV_cov.diagonal()
 
     # Check
@@ -714,11 +749,24 @@ def test_loo_multifold():
         SCRAMBLE=False,
     )
 
-    gp_lik_var = max(1e-6, NOISE_VAR)
     CV_mean, CV_cov, CV_residuals_transformed = multifold(
-        K, Y_train.numpy(), folds, gp_lik_var)
-    LOO_mean, LOO_cov, LOO_residuals_transformed = loo(K, Y_train.numpy(),
-                                                       gp_lik_var)
+        K,
+        Y_train.numpy(),
+        folds,
+        noise_variance=max(1e-6, NOISE_VAR),
+    )
+    assert CV_mean is not None
+    assert CV_cov is not None
+    assert CV_residuals_transformed is not None
+
+    LOO_mean, LOO_cov, LOO_residuals_transformed = loo(
+        K,
+        Y_train.numpy(),
+        noise_variance=max(1e-6, NOISE_VAR),
+    )
+    assert LOO_mean is not None
+    assert LOO_cov is not None
+    assert LOO_residuals_transformed is not None
 
     # Compute multifold CV and LOO
     assert np.allclose(CV_mean, LOO_mean)
