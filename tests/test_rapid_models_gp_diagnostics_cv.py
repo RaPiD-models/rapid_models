@@ -497,12 +497,14 @@ def generate_cv_data(
         outputscale=KER_SCALE_TRUE,
         lengthscale=KER_LENGTHSCALE_TRUE,
     )
+
     # Covariance matrix; shape=(N_TRAIN, N_TRAIN)
     K: gpytorch.lazy.LazyEvaluatedKernelTensor = ker(X_train)  # type: ignore
+
     # Distribution
     normal_rv: gpytorch.distributions.Distribution = gpytorch.distributions.MultivariateNormal(
-        mean=torch.zeros(N_TRAIN),
-        covariance_matrix=K,
+        mean=torch.zeros(K.shape[0]),  # vector; shape=(N_TRAIN)
+        covariance_matrix=K,  # matrix; shape=(N_TRAIN, N_TRAIN)
     )
 
     # Noise
@@ -546,7 +548,7 @@ def generate_cv_data(
 
     check_folds_indices(FOLDS_INDICES, N_TRAIN)
 
-    # Define GP model
+    # Fit GP: Create and fit GP model to training data
     _mean: gpytorch.means.Mean = gputils.gpytorch_mean_constant(
         0.0,
         fixed=True,
