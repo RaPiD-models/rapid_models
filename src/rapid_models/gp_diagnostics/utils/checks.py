@@ -1,6 +1,6 @@
 # Div functions for argument checking
 
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 from nptyping import NDArray, Shape

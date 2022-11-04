@@ -117,8 +117,9 @@ def evaluate_GP_cholesky(
     res["RMSE"] = res["MSE"]**0.5
 
     # Compute R2-score
-    res["r2-score"] = (1 - np.linalg.norm(mean)**2 /
-                       (np.linalg.norm(Y_train - np.mean(Y_train)))**2)
+    res["r2-score"] = (
+        1 - np.linalg.norm(mean)**2 /  # noqa: W504
+        (np.linalg.norm(Y_train - np.mean(Y_train)))**2)
 
     # ELD TODO: refactor: move metrics in own function
 
@@ -140,7 +141,8 @@ def log_prob_normal(
     a: NDArray[Shape['N'], Float]  # noqa: F821
     a = triang_solve(L, Y)  # La = Y
 
-    return (-(1 / 2) * np.linalg.norm(a)**2 - np.log(L.diagonal()).sum() -
+    return (-(1 / 2) * np.linalg.norm(a)**2 -  # noqa: W504
+            np.log(L.diagonal()).sum() -  # noqa: W504
             (Y.shape[0] / 2) * np.log(2 * np.pi))
 
 
