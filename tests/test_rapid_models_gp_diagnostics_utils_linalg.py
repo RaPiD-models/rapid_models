@@ -35,12 +35,12 @@ def test_symmetrify():
 
     A = random_lower_triang_matrix(N, 77)
     symmetrify(A, upper=False)
-    
+
     assert np.allclose(A - A.T, np.zeros((N, N)))
 
     A = random_lower_triang_matrix(N, 77)
     symmetrify(A.T, upper=True)
-    
+
     assert np.allclose(A - A.T, np.zeros((N, N)))
 
 

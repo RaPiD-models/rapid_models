@@ -35,7 +35,6 @@ def mulinv_solve(F, B, lower=True):
 
     lower = True -> when F is LOWER triangular. This gives faster calculation
     """
-
     tmp = triang_solve(F, B, lower=lower, trans=False)
     return triang_solve(F, tmp, lower=lower, trans=True)
 
