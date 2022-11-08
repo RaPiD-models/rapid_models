@@ -1,5 +1,9 @@
+import contextlib
+from typing import Any, Tuple, Union
+
 import gpytorch
 import torch
+from nptyping import NDArray
 
 
 class ExactGPModel(gpytorch.models.ExactGP):
@@ -8,9 +12,22 @@ class ExactGPModel(gpytorch.models.ExactGP):
     """
 
     def __init__(
-        self, train_x, train_y, mean_module, covar_module, likelihood, path, name
+        self,
+        train_x: torch.Tensor,
+        train_y: torch.Tensor,
+        mean_module: gpytorch.means.Mean,
+        covar_module: gpytorch.kernels.Kernel,
+        likelihood: gpytorch.likelihoods.Likelihood,
+        path: str = '',
+        name: str = '',
     ):
+        # Note: Overwriting the declaration of self.likelihood is necessary to make explicit to code linters
+        #       that likelihood is not optional in our implementation, i.e. likelihood cannot be None.
+        #       (This is different from the ExactGP base class implementation where likelihood can also be None.)
+        self.likelihood: gpytorch.likelihoods.Likelihood
+
         super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
+        assert self.likelihood is not None
 
         # For saving and loading
         self.path = path
@@ -21,7 +38,8 @@ class ExactGPModel(gpytorch.models.ExactGP):
         self.mean_module = mean_module
         self.covar_module = covar_module
 
-    def forward(self, x):
+    def forward(self,
+                x: torch.Tensor) -> gpytorch.distributions.MultivariateNormal:
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
@@ -40,7 +58,13 @@ class ExactGPModel(gpytorch.models.ExactGP):
         self.train()
         self.likelihood.train()
 
-    def predict(self, x, latent=True, CG_tol=0.1, full_cov=False):
+    def predict(
+        self,
+        x: torch.Tensor,
+        latent: bool = True,
+        CG_tol: float = 0.1,
+        full_cov: bool = False,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Return mean and covariance at x
 
@@ -55,42 +79,53 @@ class ExactGPModel(gpytorch.models.ExactGP):
         mean and covariance
         """
 
+        mean: torch.Tensor
+        var: torch.Tensor
         with torch.no_grad(), gpytorch.settings.eval_cg_tolerance(CG_tol):
 
             # Latent distribution
-            dist = self.__call__(x)
+            dist: torch.distributions.Distribution = self.__call__(x)
 
             # Observational distribution
             if not latent:
-                dist = self.likelihood(dist)
+                _dist = self.likelihood(dist)
+                if isinstance(_dist, torch.distributions.Distribution):
+                    dist = _dist
 
             # Extract mean and covariance
+            assert isinstance(dist, gpytorch.distributions.MultivariateNormal)
+            # if isinstance(dist, gpytorch.distributions.MultivariateNormal):
             mean = dist.mean.cpu()
-            var = dist.covariance_matrix.cpu() if full_cov else dist.variance.cpu()
+            var = dist.covariance_matrix.cpu(  # type: ignore
+            ) if full_cov else dist.variance.cpu()
 
-            return mean, var
+        return mean, var
 
     def print_parameters(self):
         """
         Print actual (not raw) parameters
         """
-        print("{:50} {}".format("Constant mean", self.mean_module.constant.item()))
-        print(
-            "{:50} {}".format(
-                "Likelihood noise variance", self.likelihood.noise_covar.noise.item()
-            )
-        )
-        print(
-            "{:50} {}".format(
-                "Kernel lengthscale",
-                self.covar_module.base_kernel.lengthscale.detach().numpy()[0],
-            )
-        )
-        print(
-            "{:50} {}".format(
-                "Kernel outputscale (variace)", self.covar_module.outputscale.item()
-            )
-        )
+        _constant_mean: Union[torch.Tensor, str] = '--'
+        with contextlib.suppress(Exception):
+            _constant_mean = self.mean_module.constant.item()  # type: ignore
+
+        _noise: Union[torch.Tensor, str] = '--'
+        with contextlib.suppress(Exception):
+            _noise = self.likelihood.noise_covar.noise.item()  # type: ignore
+
+        _lengthscale: Union[NDArray[Any, Any], str] = '--'
+        with contextlib.suppress(Exception):
+            _lengthscale = self.covar_module.base_kernel.lengthscale.detach(  # type: ignore
+            ).numpy()[0]
+
+        _outputscale: Union[torch.Tensor, str] = '--'
+        with contextlib.suppress(Exception):
+            _outputscale = self.covar_module.outputscale.item()  # type: ignore
+
+        print("{:50} {}".format("Constant mean", _constant_mean))
+        print("{:50} {}".format("Likelihood noise variance", _noise))
+        print("{:50} {}".format("Kernel lengthscale", _lengthscale))
+        print("{:50} {}".format("Kernel outputscale (variance)", _outputscale))
 
     def save(self):
         """

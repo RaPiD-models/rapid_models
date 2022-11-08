@@ -2,10 +2,8 @@
 import numpy as np
 from scipy import stats
 
-from rapid_models.gp_diagnostics.metrics import (
-    log_prob_normal,
-    log_prob_standard_normal,
-)
+from rapid_models.gp_diagnostics.metrics import (log_prob_normal,
+                                                 log_prob_standard_normal)
 
 
 def test_log_prob_normal():
@@ -27,6 +25,7 @@ def test_log_prob_normal():
     loglik = log_prob_normal(L, Y)
     loglik_scipy = stats.multivariate_normal.logpdf(Y, mean=np.zeros(N), cov=C)
 
+    assert isinstance(loglik, float)
     assert np.allclose(loglik, loglik_scipy)
 
 
@@ -43,6 +42,7 @@ def test_log_prob_standard_normal():
 
     # Compute likelihood
     loglik = log_prob_standard_normal(Y)
-    loglik_scipy = stats.multivariate_normal.logpdf(Y, mean=np.zeros(N), cov=np.eye(N))
+    loglik_scipy = stats.multivariate_normal.logpdf(
+        Y, mean=np.zeros(N), cov=np.eye(N))  # type: ignore
 
     assert np.allclose(loglik, loglik_scipy)

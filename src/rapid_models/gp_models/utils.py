@@ -1,6 +1,14 @@
+from typing import Union
+
 import gpytorch
+import gpytorch.constraints
+import torch
 
 
+# @TODO: This function is nowhere called.
+#        If we keep it, we should add type hints and possibly a unit test.
+#        @AGRE / @ELD: Delete?
+#        CLAROS, 2022-11-01
 def optim_step(model, loss_function, optimizer):
     """
     Return current loss and perform one optimization step
@@ -20,22 +28,29 @@ def optim_step(model, loss_function, optimizer):
 
 
 def gpytorch_kernel_Matern(
-    var, ls, nu=2.5, lengthscale_constraint=gpytorch.constraints.Positive()
-):
+    outputscale: float,
+    lengthscale: torch.Tensor,
+    nu: float = 2.5,
+    lengthscale_constraint: Union[gpytorch.constraints.Interval, None] = None
+) -> gpytorch.kernels.Kernel:
     """
-    Return a Matern kernel with specified kernel variance (var) and lengthscales (ls)
+    Return a scaled Matern kernel with specified output scale and lengthscale
     """
-    ker_mat = gpytorch.kernels.MaternKernel(
-        nu=nu, ard_num_dims=len(ls), lengthscale_constraint=lengthscale_constraint
+    lengthscale_constraint = lengthscale_constraint or gpytorch.constraints.Positive(
     )
-    ker_mat.lengthscale = ls
+    ker_mat = gpytorch.kernels.MaternKernel(
+        nu=nu,
+        ard_num_dims=len(lengthscale),
+        lengthscale_constraint=lengthscale_constraint)
+    ker_mat.lengthscale = lengthscale
     ker = gpytorch.kernels.ScaleKernel(ker_mat)
-    ker.outputscale = var
+    ker.outputscale = outputscale
 
     return ker
 
 
-def gpytorch_mean_constant(val, fixed=True):
+def gpytorch_mean_constant(val: float,
+                           fixed: bool = True) -> gpytorch.means.Mean:
     """
     Return a constant mean function
 
@@ -43,12 +58,16 @@ def gpytorch_mean_constant(val, fixed=True):
     """
     mean = gpytorch.means.ConstantMean()
     mean.initialize(constant=val)
+    assert isinstance(mean.constant, torch.Tensor)
     mean.constant.requires_grad = not fixed
 
     return mean
 
 
-def gpytorch_likelihood_gaussian(variance, variance_lb=1e-6, fixed=True):
+def gpytorch_likelihood_gaussian(
+        variance: float,
+        variance_lb: float = 1e-6,
+        fixed: bool = True) -> gpytorch.likelihoods.Likelihood:
     """
     Return a Gaussian likelihood
 
@@ -56,9 +75,14 @@ def gpytorch_likelihood_gaussian(variance, variance_lb=1e-6, fixed=True):
     variance_lb = lower bound
     """
     likelihood = gpytorch.likelihoods.GaussianLikelihood(
-        noise_constraint=gpytorch.constraints.GreaterThan(variance_lb)
-    )
+        noise_constraint=gpytorch.constraints.GreaterThan(variance_lb))
     likelihood.initialize(noise=variance)
+    # @TODO: Base type of likelihood is gpytorch.Module, not torch.Tensor .
+    #        Natively, hence, likelihood does not have an attribute 'requires_grad'.
+    #        What the following code effectively does is to dynamically
+    #        add an attribute with name='requires_grad' to the likelihood instance and assign it a boolean value.
+    #        @AGRE / @ELD: Is this really what you intended, and is it necessary?
+    #        CLAROS, 2022-11-01
     likelihood.requires_grad = not fixed
 
     return likelihood
