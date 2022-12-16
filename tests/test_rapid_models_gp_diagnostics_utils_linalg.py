@@ -1,17 +1,21 @@
 # import pytest
 import numpy as np
 
-from rapid_models.gp_diagnostics.utils.linalg import (
-    triang_solve,
-    mulinv_solve,
-    mulinv_solve_rev,
-    symmetrify,
-    chol_inv,
-    traceprod,
-    # try_chol,
-)
+from rapid_models.gp_diagnostics.utils.linalg import chol_inv  # try_chol,
+from rapid_models.gp_diagnostics.utils.linalg import (mulinv_solve,
+                                                      mulinv_solve_rev,
+                                                      symmetrify, traceprod,
+                                                      triang_solve)
 
 # TODO: if we keep try_col, implement a test for it
+
+
+def random_array(N, seed):
+    """
+    Return random array of size N
+    """
+    np.random.seed(seed)
+    return np.random.uniform(size=(N, ))
 
 
 def random_matrix(N, M, seed):
@@ -55,18 +59,51 @@ def test_triang_solve():
 
     # Solve L*X = B and check
     X = triang_solve(L, B, lower=True, trans=False)
+    assert X.shape == (N, M)
     assert np.allclose(B, L.dot(X))
 
     # Solve L.T*X = B and check
     X = triang_solve(L.T, B, lower=False, trans=False)
+    assert X.shape == (N, M)
     assert np.allclose(B, L.T.dot(X))
 
     # Solve L.T*X = B and check
     X = triang_solve(L, B, lower=True, trans=True)
+    assert X.shape == (N, M)
     assert np.allclose(B, L.T.dot(X))
 
     # Solve L*X = B and check
     X = triang_solve(L.T, B, lower=False, trans=True)
+    assert X.shape == (N, M)
+    assert np.allclose(B, L.dot(X))
+
+
+def test_triang_solve_with_B_being_1D_array():
+    N = 10
+
+    # Generate matrices
+    L = random_lower_triang_matrix(N, 42)
+    B = random_array(N, 43)
+    # A = L.dot(L.T)
+
+    # Solve L*X = B and check
+    X = triang_solve(L, B, lower=True, trans=False)
+    assert X.shape == (N, )
+    assert np.allclose(B, L.dot(X))
+
+    # Solve L.T*X = B and check
+    X = triang_solve(L.T, B, lower=False, trans=False)
+    assert X.shape == (N, )
+    assert np.allclose(B, L.T.dot(X))
+
+    # Solve L.T*X = B and check
+    X = triang_solve(L, B, lower=True, trans=True)
+    assert X.shape == (N, )
+    assert np.allclose(B, L.T.dot(X))
+
+    # Solve L*X = B and check
+    X = triang_solve(L.T, B, lower=False, trans=True)
+    assert X.shape == (N, )
     assert np.allclose(B, L.dot(X))
 
 
@@ -81,10 +118,31 @@ def test_mulinv_solve():
 
     # Solve A*X = B and check
     X = mulinv_solve(L, B, lower=True)
+    assert X.shape == (N, M)
     assert np.allclose(B, A.dot(X))
 
     # Solve A*X = B and check
     X = mulinv_solve(L.T, B, lower=False)
+    assert X.shape == (N, M)
+    assert np.allclose(B, L.T.dot(L).dot(X))
+
+
+def test_mulinv_solve_with_B_being_1D_array():
+    N = 10
+
+    # Generate matrix and array
+    L = random_lower_triang_matrix(N, 42)
+    B = random_array(N, 43)
+    A = L.dot(L.T)
+
+    # Solve A*X = B and check
+    X = mulinv_solve(L, B, lower=True)
+    assert X.shape == (N, )
+    assert np.allclose(B, A.dot(X))
+
+    # Solve A*X = B and check
+    X = mulinv_solve(L.T, B, lower=False)
+    assert X.shape == (N, )
     assert np.allclose(B, L.T.dot(L).dot(X))
 
 
@@ -99,10 +157,31 @@ def test_mulinv_solve_rev():
 
     # Solve X*A = B and check
     X = mulinv_solve_rev(L, B, lower=True)
+    assert X.shape == (M, N)
     assert np.allclose(B, X.dot(A))
 
     # Solve X*A = B and check
     X = mulinv_solve_rev(L.T, B, lower=False)
+    assert X.shape == (M, N)
+    assert np.allclose(B, X.dot(L.T.dot(L)))
+
+
+def test_mulinv_solve_rev_with_B_being_1D_array():
+    N = 10
+
+    # Generate matrices
+    L = random_lower_triang_matrix(N, 42)
+    B = random_array(N, 43)
+    A = L.dot(L.T)
+
+    # Solve X*A = B and check
+    X = mulinv_solve_rev(L, B, lower=True)
+    assert X.shape == (N, )
+    assert np.allclose(B, X.dot(A))
+
+    # Solve X*A = B and check
+    X = mulinv_solve_rev(L.T, B, lower=False)
+    assert X.shape == (N, )
     assert np.allclose(B, X.dot(L.T.dot(L)))
 
 

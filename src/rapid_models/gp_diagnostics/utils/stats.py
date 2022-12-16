@@ -1,9 +1,19 @@
 import itertools
-from scipy.stats import norm
+from typing import Any, List, Tuple, Union, overload
+
 import numpy as np
+import torch
+from nptyping import Float, NDArray, Shape
+from scipy.stats import norm
 
 
-def snorm_qq(x):
+def snorm_qq(
+    x: NDArray[Shape['N'], Float]  # noqa: F821
+) -> Tuple[NDArray[Shape['N'], Float],  # noqa: F821
+           NDArray[Shape['N'], Float],  # noqa: F821
+           NDArray[Shape['N'], Float],  # noqa: F821
+           NDArray[Shape['N'], Float]  # noqa: F821
+           ]:
     """
     Function for calculating standard normal QQ plot data with 95% confidence.
 
@@ -49,7 +59,33 @@ def snorm_qq(x):
     return q_sample, q_snorm, q_snorm_upper, q_snorm_lower
 
 
-def split_test_train_fold(folds, X, i):
+@overload
+def split_test_train_fold(
+    folds: List[List[int]],
+    X: NDArray[Shape['*, ...'], Any],  # noqa: F722
+    i: int,
+) -> Tuple[NDArray[Shape['*, ...'], Any],  # noqa: F722
+           NDArray[Shape['*, ...'], Any]  # noqa: F722
+           ]:
+    ...
+
+
+@overload
+def split_test_train_fold(
+    folds: List[List[int]],
+    X: torch.Tensor,
+    i: int,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    ...
+
+
+def split_test_train_fold(
+    folds: List[List[int]],
+    X: Union[NDArray[Shape['*, ...'], Any], torch.Tensor],  # noqa: F722
+    i: int,
+) -> Union[Tuple[NDArray[Shape['*, ...'], Any],  # noqa: F722
+                 NDArray[Shape['*, ...'], Any]  # noqa: F722
+                 ], Tuple[torch.Tensor, torch.Tensor]]:
     """
     Split X into X_train, X_test where
 
@@ -64,6 +100,6 @@ def split_test_train_fold(folds, X, i):
     """
 
     idx_test = folds[i]
-    idx_train = list(itertools.chain(*(folds[0:i] + folds[i + 1 :])))
+    idx_train = list(itertools.chain(*(folds[:i] + folds[i + 1:])))
 
-    return X[idx_test], X[idx_train]
+    return X[idx_test], X[idx_train]  # type: ignore
