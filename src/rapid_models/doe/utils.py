@@ -76,9 +76,10 @@ def in_hull(p, hull):
     coordinates of `M` points in `K`dimensions for which Delaunay triangulation
     will be computed
     """
-    from scipy.spatial import Delaunay
+    # from scipy.spatial import Delaunay
 
-    if not isinstance(hull, Delaunay):
-        hull = Delaunay(hull)
+    # if not isinstance(hull, Delaunay):
+    #     hull = Delaunay(hull)
 
-    return hull.find_simplex(p) >= 0
+    # return hull.find_simplex(p) >= 0
+    return None
