@@ -379,6 +379,17 @@ def test_in_hull_non_array2():
         doe.in_hull(np.ones((2, 3)), 15)
 
 
+def test_in_hull_output_shape(lhs_2d_n50, pts_def_hull):
+    """
+    Test output shape of a polygon hull
+    """
+    # 2. Act
+    b_inhull = doe.in_hull(lhs_2d_n50, pts_def_hull)
+    # 3. Assert
+    assert b_inhull.shape == (len(lhs_2d_n50),)
+    assert isinstance(b_inhull, np.ndarray)
+
+
 def test_in_hull_1(lhs_2d_n50, pts_def_hull):
     """
     Test output 1 of a polygon hull

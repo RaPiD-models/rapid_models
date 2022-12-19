@@ -82,16 +82,17 @@ def in_hull(p, hull):
     will be computed.
 
     Args:
-        p (array-like): 2D, set of points to check if inside convex hull
-        hull (array like / scipy.spatial.Delaunay): Set of points (array-like,
-            2D) to calculate the Delaunay tessellation in N dimensions using the
+        p (array-like): NxK array. Set of `N` points in `K` dimensions for
+            which to check if is inside convex hull.
+        hull (array like / scipy.spatial.Delaunay): MxK array. Set of `M` points
+            in `K` dimensions to calculate the Delaunay tessellation using the
             [Qhull library](http://www.qhull.org/), or an existing
             scipy.spatial.Delaunay object.
     Returns:
-        b_in_hull (boolean ndarray): 1D boolean array of sample points. `True'
-            indicate that the point of that index is inside the triangulation
-            while `False` indicate that the point of corresonding index is
-            outside the triangulation.
+        b_in_hull (boolean ndarray): (N, ) boolean array of sample points where
+            `True' indicate that the point of that index is inside the
+            triangulation while `False` indicate that the point of
+            corresponding index is outside the triangulation.
 
     """
 
@@ -122,7 +123,21 @@ def in_hull(p, hull):
 
 def sample_N_maximize_distance(points, N, values=None, type="center", random_state=42):
     """
-    Based on https://stackoverflow.com/questions/69195903/sample-n-points-from-a-set-of-3d-points-that-maximizes-the-minimum-distance
+    Based on
+    https://stackoverflow.com/questions/69195903/
+
+    Args:
+        p (array-like): 2D Array with shape MxK, set of points to check if
+            inside convex hull
+        hull (array like / scipy.spatial.Delaunay): Set of points (array-like,
+            2D) to calculate the Delaunay tessellation in N dimensions using the
+            [Qhull library](http://www.qhull.org/), or an existing
+            scipy.spatial.Delaunay object.
+    Returns:
+        points (ndarray): NxK Array of N K-dimensional points representing the
+            `type` (default "center") in the N kmeans clusters.
+            values (ndarray): optional
+
     """
 
     ret_ixs = None
