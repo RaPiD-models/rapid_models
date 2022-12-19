@@ -1,6 +1,8 @@
 import pyDOE2  # ELD TODO: Is it ok to import all from pyDOE to use this doe as a wrapper?
 import numpy as np
 
+from scipy.spatial import Delaunay
+
 
 def fullfact_with_bounds(LBs, UBs, N_xi):
     """
@@ -76,10 +78,27 @@ def in_hull(p, hull):
     coordinates of `M` points in `K`dimensions for which Delaunay triangulation
     will be computed
     """
-    # from scipy.spatial import Delaunay
 
-    # if not isinstance(hull, Delaunay):
-    #     hull = Delaunay(hull)
+    p = np.array(p)
 
-    # return hull.find_simplex(p) >= 0
-    return None
+    if not len(p.shape) == 2:
+        raise ValueError(
+            "p must be a NxK 2D array of `N`points in `K` dimensions. p.shape: {}".format(
+                p
+            )
+        )
+
+    if not isinstance(hull, Delaunay):
+        hull = np.array(hull)
+        if not len(hull.shape) == 2:
+            raise ValueError(
+                "hull must be a scipy.spatial.Delaunay object or a MxK 2D array of `M`points in `K` dimensions for which Delaunay triangulation will be computed"
+            )
+        if not p.shape[1] == hull.shape[1]:
+            raise ValueError(
+                "Size of second dimension of p and hull must be the same (i.e. p and hull must have the same 'K' dimensions."
+            )
+
+        hull = Delaunay(hull)
+
+    return hull.find_simplex(p) >= 0
