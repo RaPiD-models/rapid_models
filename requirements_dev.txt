@@ -16,4 +16,3 @@ plotly
 ipywidgets>=7.0.0
 sklearn
 matplotlib
-nptyping
