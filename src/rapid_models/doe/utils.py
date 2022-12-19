@@ -79,7 +79,20 @@ def in_hull(p, hull):
     `p` should be a `NxK` coordinates of `N` points in `K` dimensions
     `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the
     coordinates of `M` points in `K`dimensions for which Delaunay triangulation
-    will be computed
+    will be computed.
+
+    Args:
+        p (array-like): 2D, set of points to check if inside convex hull
+        hull (array like / scipy.spatial.Delaunay): Set of points (array-like,
+            2D) to calculate the Delaunay tessellation in N dimensions using the
+            [Qhull library](http://www.qhull.org/), or an existing
+            scipy.spatial.Delaunay object.
+    Returns:
+        b_in_hull (boolean ndarray): 1D boolean array of sample points. `True'
+            indicate that the point of that index is inside the triangulation
+            while `False` indicate that the point of corresonding index is
+            outside the triangulation.
+
     """
 
     p = np.array(p)
