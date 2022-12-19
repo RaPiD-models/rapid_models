@@ -462,8 +462,8 @@ def generate_cv_data(
 ) -> Tuple[NDArray[Shape['N_TRAIN'], Float],  # noqa: F821 residual means
            NDArray[Shape['N_TRAIN'], Float],  # noqa: F821 residual variances
            List[List[int]],  # folds indices
-           NDArray[Shape['N_TRAIN, N_TRAIN'],
-                   Float],  # noqa: F821 covariance matrix
+           NDArray[Shape['N_TRAIN, N_TRAIN'],  # noqa: F821
+                   Float],  # covariance matrix
            torch.Tensor,  # X_train  shape=(N_TRAIN, N_DIM)
            torch.Tensor  # Y_train  shape=(N_TRAIN)
            ]:
@@ -591,11 +591,11 @@ def generate_cv_data(
     # Concatenate and sort so that the residuals correspond to observation 1, 2, 3 etc.
     cv_residual_means: NDArray[Shape['N_TRAIN'], Float]  # noqa: F821
     cv_residual_vars: NDArray[Shape['N_TRAIN'], Float]  # noqa: F821
-    cv_residual_means = np.array(_residual_means).flatten()
-    cv_residual_vars = np.array(_residual_vars).flatten()
-    if NUM_FOLDS != N_TRAIN:
-        cv_residual_means = np.concatenate(cv_residual_means)
-        cv_residual_vars = np.concatenate(cv_residual_vars)
+    cv_residual_means = np.block(_residual_means).flatten()
+    cv_residual_vars = np.block(_residual_vars).flatten()
+    # if NUM_FOLDS != N_TRAIN:
+    #     cv_residual_means = np.concatenate(cv_residual_means)
+    #     cv_residual_vars = np.concatenate(cv_residual_vars)
 
     folds_concat = sum(FOLDS_INDICES, [])
     idx_sort = list(np.argsort(folds_concat))
