@@ -3,6 +3,9 @@ import numpy as np
 
 from scipy.spatial import Delaunay
 
+from sklearn.cluster import KMeans
+from scipy.spatial import distance_matrix
+
 
 def fullfact_with_bounds(LBs, UBs, N_xi):
     """
@@ -102,3 +105,65 @@ def in_hull(p, hull):
         hull = Delaunay(hull)
 
     return hull.find_simplex(p) >= 0
+
+
+def sample_N_maximize_distance(points, N, values=None, type="center", random_state=42):
+    """
+    Based on https://stackoverflow.com/questions/69195903/sample-n-points-from-a-set-of-3d-points-that-maximizes-the-minimum-distance
+    """
+
+    ret_ixs = None
+
+    kmeans = KMeans(n_clusters=N, random_state=random_state).fit(points)
+    labels = kmeans.predict(points)
+    cntr = kmeans.cluster_centers_
+
+    if type.lower() == "center":
+        return cntr
+    elif type.lower() == "center_closest_point":
+        # indices of nearest points to centres
+
+        for q, c in enumerate(cntr):
+            ixs = np.where(labels == q)[0]
+            pts = points[ixs]
+            d = distance_matrix(c[None, ...], pts)
+            idx1 = np.argmin(d, axis=1) + 1
+            idx2 = np.searchsorted(np.cumsum(labels == q), idx1)[0]
+            if ret_ixs is None:
+                ret_ixs = np.array(idx2)
+            else:
+                ret_ixs = np.append(ret_ixs, idx2)
+
+        if values is not None:
+            return points[ret_ixs], values[ret_ixs]
+        else:
+            return points[ret_ixs]
+
+    elif type.lower() == "max":
+        if values is None:
+            print("values=None: type='max' is not possible, returning None")
+            return None
+        else:
+            for q, c in enumerate(cntr):
+                f_lab = labels == q
+                val = values[f_lab].max()
+                if ret_ixs is None:
+                    ret_ixs = np.where(f_lab & (values == val))[0][:1]
+                else:
+                    ret_ixs = np.append(ret_ixs, np.where(f_lab & (values == val))[0])
+            return points[ret_ixs], values[ret_ixs]
+
+    elif type.lower() == "min":
+        if values is None:
+            print("values=None: type='min' is not possible, returning None")
+            return None
+        else:
+            for q, c in enumerate(cntr):
+                f_lab = labels == q
+                val = values[f_lab].min()
+                if ret_ixs is None:
+                    ret_ixs = np.where(f_lab & (values == val))[0][:1]
+                else:
+                    ret_ixs = np.append(ret_ixs, np.where(f_lab & (values == val))[0])
+
+            return points[ret_ixs], values[ret_ixs]
