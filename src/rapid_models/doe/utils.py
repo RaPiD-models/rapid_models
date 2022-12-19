@@ -127,16 +127,23 @@ def sample_N_maximize_distance(points, N, values=None, type="center", random_sta
     https://stackoverflow.com/questions/69195903/
 
     Args:
-        p (array-like): 2D Array with shape MxK, set of points to check if
-            inside convex hull
-        hull (array like / scipy.spatial.Delaunay): Set of points (array-like,
-            2D) to calculate the Delaunay tessellation in N dimensions using the
-            [Qhull library](http://www.qhull.org/), or an existing
-            scipy.spatial.Delaunay object.
+        points (array-like): PxK array, set of ´P´ points in ´K´ dimensions
+            from which to calculate N k-means clusters to use as distance
+            maximizing samples in K-dimensions
+        N (int): Number of clusters
+        values (array-like, 1D): Array of corresponding values at each point in
+            `points`. These values can be used to select e.g. minimum or maximum
+            values inside each cluster by specifying `type`
+        type (str, default="center"): default type select center of k-means
+            cluster. "center_closest_point" select the point which are closest
+            to the cluster center, "min" select the point with the corresponding
+            minimum value, "max" select the point with the corresponding maximum
+            value
     Returns:
-        points (ndarray): NxK Array of N K-dimensional points representing the
-            `type` (default "center") in the N kmeans clusters.
-            values (ndarray): optional
+        points (ndarray): NxK array of ´N´ points in ´K´ dimensions
+            representing the `type` (default "center") in the N k-means
+            clusters.
+        values (ndarray): optional array of `N` values of the returned points.
 
     """
 
