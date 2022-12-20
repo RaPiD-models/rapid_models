@@ -121,7 +121,7 @@ def in_hull(p, hull):
     return hull.find_simplex(p) >= 0
 
 
-def sample_N_maximize_distance(points, N, values=None, type="center", random_state=42):
+def kmeans_sample(points, N, values=None, type="center", random_state=42):
     """
     Based on
     https://stackoverflow.com/questions/69195903/
