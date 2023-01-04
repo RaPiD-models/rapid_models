@@ -14,5 +14,5 @@ pytest
 pyDOE2
 plotly
 ipywidgets>=7.0.0
-sklearn
+scikit-learn
 matplotlib
