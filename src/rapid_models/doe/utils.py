@@ -121,7 +121,7 @@ def in_hull(p, hull):
     return hull.find_simplex(p) >= 0
 
 
-def kmeans_sample(points, N, values=None, type="center", random_state=42):
+def kmeans_sample(points, N, values=None, mode="center", random_state=42):
     """
     Based on
     https://stackoverflow.com/questions/69195903/
@@ -133,19 +133,33 @@ def kmeans_sample(points, N, values=None, type="center", random_state=42):
         N (int): Number of clusters
         values (array-like, 1D): Array of corresponding values at each point in
             `points`. These values can be used to select e.g. minimum or maximum
-            values inside each cluster by specifying `type`
-        type (str, default="center"): default type select center of k-means
+            values inside each cluster by specifying `mode`
+        mode (str, default="center"): default mode select center of k-means
             cluster. "center_closest_point" select the point which are closest
             to the cluster center, "min" select the point with the corresponding
             minimum value, "max" select the point with the corresponding maximum
             value
     Returns:
         points (ndarray): NxK array of ´N´ points in ´K´ dimensions
-            representing the `type` (default "center") in the N k-means
+            representing the `mode` (default "center") in the N k-means
             clusters.
         values (ndarray): optional array of `N` values of the returned points.
 
     """
+
+    if not isinstance(mode, str):
+        raise TypeError(
+            "mode must be one of the following strings: ´center´, ´center_closest_point´, ´min´, or ´max´"
+        )
+    if not mode.lower() in ["center", "center_closest_point", "min", "max"]:
+        raise ValueError(
+            "mode must be one of the following strings: ´center´, ´center_closest_point´, ´min´, or ´max´"
+        )
+    if mode.lower() in ["min", "max"]:
+        if values is None:
+            raise TypeError(
+                "values=None. If mode is ´min´ or ´max´, values corresponding to the points need to be given."
+            )
 
     ret_ixs = None
 
@@ -153,9 +167,9 @@ def kmeans_sample(points, N, values=None, type="center", random_state=42):
     labels = kmeans.predict(points)
     cntr = kmeans.cluster_centers_
 
-    if type.lower() == "center":
+    if mode.lower() == "center":
         return cntr
-    elif type.lower() == "center_closest_point":
+    elif mode.lower() == "center_closest_point":
         # indices of nearest points to centres
 
         for q, c in enumerate(cntr):
@@ -174,9 +188,9 @@ def kmeans_sample(points, N, values=None, type="center", random_state=42):
         else:
             return points[ret_ixs]
 
-    elif type.lower() == "max":
+    elif mode.lower() == "max":
         if values is None:
-            print("values=None: type='max' is not possible, returning None")
+            print("values=None: mode='max' is not possible, returning None")
             return None
         else:
             for q, c in enumerate(cntr):
@@ -188,9 +202,9 @@ def kmeans_sample(points, N, values=None, type="center", random_state=42):
                     ret_ixs = np.append(ret_ixs, np.where(f_lab & (values == val))[0])
             return points[ret_ixs], values[ret_ixs]
 
-    elif type.lower() == "min":
+    elif mode.lower() == "min":
         if values is None:
-            print("values=None: type='min' is not possible, returning None")
+            print("values=None: mode='min' is not possible, returning None")
             return None
         else:
             for q, c in enumerate(cntr):
