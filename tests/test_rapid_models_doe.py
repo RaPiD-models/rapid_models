@@ -236,6 +236,8 @@ def test_lhs_with_bounds_1():
 
 
 # TEST rapid_models.doe.in_hull()
+
+
 @pytest.fixture
 def lhs_2d_n20():
     return np.array(
@@ -440,3 +442,46 @@ def test_in_hull_2(lhs_2d_n50, pts_def_circ):
             ]
         ),
     )
+
+
+# TEST rapid_models.doe.sample_N_kmeans_cluster()
+
+
+def test_kmeans_sample_N_int(lhs_2d_n50):
+    """
+    Test TypeError raised for non-int input of ´N´
+    """
+    with pytest.raises(TypeError):
+        doe.kmeans_sample(
+            points=lhs_2d_n50, N="1", values=None, mode="center", random_state=42
+        )
+
+
+def test_kmeans_sample_mode_str(lhs_2d_n50):
+    """
+    Test TypeError raised for non-string input of ´type´
+    """
+    with pytest.raises(TypeError):
+        doe.kmeans_sample(
+            points=lhs_2d_n50, N=10, values=None, mode=34, random_state=42
+        )
+
+
+def test_kmeans_sample_mode_val(lhs_2d_n50):
+    """
+    Test ValueError raised for input of ´type´ not supported
+    """
+    with pytest.raises(ValueError):
+        doe.kmeans_sample(
+            points=lhs_2d_n50, N=10, values=None, mode="whatever", random_state=42
+        )
+
+
+def test_kmeans_sample_values_None(lhs_2d_n50):
+    """
+    Test ValueError raised for input of ´values´=None when ´type´ require values
+    """
+    with pytest.raises(TypeError):
+        doe.kmeans_sample(
+            points=lhs_2d_n50, N=10, values=None, mode="min", random_state=42
+        )
