@@ -56,6 +56,7 @@ setup(
         "pyDOE2",
         "numpy",
         "scipy",
+        "scikit-learn",
         "torch>=1.10.0",
         "gpytorch>=1.6.0",
         "nptyping",

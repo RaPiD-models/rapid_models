@@ -1,6 +1,11 @@
 import pyDOE2  # ELD TODO: Is it ok to import all from pyDOE to use this doe as a wrapper?
 import numpy as np
 
+from scipy.spatial import Delaunay
+
+from sklearn.cluster import KMeans
+from scipy.spatial import distance_matrix
+
 
 def fullfact_with_bounds(LBs, UBs, N_xi):
     """
@@ -65,3 +70,153 @@ def lhs_with_bounds(nDim, nSamples, LBs, UBs, random_state=None):
     lhs = pyDOE2.lhs(nDim, samples=nSamples, random_state=random_state)
 
     return LBs + lhs * (UBs - LBs)
+
+
+def in_hull(p, hull):
+    """
+    Test if points in `p` are in `hull`
+
+    `p` should be a `NxK` coordinates of `N` points in `K` dimensions
+    `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the
+    coordinates of `M` points in `K`dimensions for which Delaunay triangulation
+    will be computed.
+
+    Args:
+        p (array-like): NxK array. Set of `N` points in `K` dimensions for
+            which to check if is inside convex hull.
+        hull (array like / scipy.spatial.Delaunay): MxK array. Set of `M` points
+            in `K` dimensions to calculate the Delaunay tessellation using the
+            [Qhull library](http://www.qhull.org/), or an existing
+            scipy.spatial.Delaunay object.
+    Returns:
+        b_in_hull (boolean ndarray): (N, ) boolean array of sample points where
+            `True' indicate that the point of that index is inside the
+            triangulation while `False` indicate that the point of
+            corresponding index is outside the triangulation.
+
+    """
+
+    p = np.array(p)
+
+    if not len(p.shape) == 2:
+        raise ValueError(
+            "p must be a NxK 2D array of `N`points in `K` dimensions. p.shape: {}".format(
+                p
+            )
+        )
+
+    if not isinstance(hull, Delaunay):
+        hull = np.array(hull)
+        if not len(hull.shape) == 2:
+            raise ValueError(
+                "hull must be a scipy.spatial.Delaunay object or a MxK 2D array of `M`points in `K` dimensions for which Delaunay triangulation will be computed"
+            )
+        if not p.shape[1] == hull.shape[1]:
+            raise ValueError(
+                "Size of second dimension of p and hull must be the same (i.e. p and hull must have the same 'K' dimensions."
+            )
+
+        hull = Delaunay(hull)
+
+    return hull.find_simplex(p) >= 0
+
+
+def kmeans_sample(points, N, values=None, mode="center", random_state=42):
+    """
+    Based on
+    https://stackoverflow.com/questions/69195903/
+
+    Args:
+        points (array-like): PxK array, set of ´P´ points in ´K´ dimensions
+            from which to calculate N k-means clusters to use as distance
+            maximizing samples in K-dimensions
+        N (int): Number of clusters
+        values (array-like, 1D): Array of corresponding values at each point ´P´
+            in `points`. These values can be used to select e.g. minimum or
+            maximum values inside each cluster by specifying `mode`
+        mode (str, default="center"): default mode select center of k-means
+            cluster. "center_closest_point" select the point which are closest
+            to the cluster center, "min" select the point with the corresponding
+            minimum value, "max" select the point with the corresponding maximum
+            value
+    Returns:
+        points (ndarray): NxK array of ´N´ points in ´K´ dimensions
+            representing the `mode` (default "center") in the N k-means
+            clusters.
+        values (ndarray): optional array of `N` values of the returned points.
+
+    """
+
+    if not isinstance(mode, str):
+        raise TypeError(
+            "mode must be one of the following strings: ´center´, ´center_closest_point´, ´min´, or ´max´"
+        )
+    if not mode.lower() in ["center", "center_closest_point", "min", "max"]:
+        raise ValueError(
+            "mode must be one of the following strings: ´center´, ´center_closest_point´, ´min´, or ´max´"
+        )
+    if mode.lower() in ["min", "max"]:
+        if values is None:
+            raise TypeError(
+                "values=None. If mode is ´min´ or ´max´, values corresponding to the points need to be given."
+            )
+        if not np.array(values).shape[0] == np.array(points).shape[0]:
+            raise ValueError(
+                "Length of 1D array ´Values´ must match 2nd dimension of 2D array ´points´."
+            )
+
+    ret_ixs = None
+
+    kmeans = KMeans(n_clusters=N, random_state=random_state).fit(points)
+    labels = kmeans.predict(points)
+    cntr = kmeans.cluster_centers_
+
+    if mode.lower() == "center":
+        return cntr
+    elif mode.lower() == "center_closest_point":
+        # indices of nearest points to centres
+
+        for q, c in enumerate(cntr):
+            ixs = np.where(labels == q)[0]
+            pts = points[ixs]
+            d = distance_matrix(c[None, ...], pts)
+            idx1 = np.argmin(d, axis=1) + 1
+            idx2 = np.searchsorted(np.cumsum(labels == q), idx1)[0]
+            if ret_ixs is None:
+                ret_ixs = np.array(idx2)
+            else:
+                ret_ixs = np.append(ret_ixs, idx2)
+
+        if values is not None:
+            return points[ret_ixs], values[ret_ixs]
+        else:
+            return points[ret_ixs]
+
+    elif mode.lower() == "max":
+        if values is None:
+            print("values=None: mode='max' is not possible, returning None")
+            return None
+        else:
+            for q, c in enumerate(cntr):
+                f_lab = labels == q
+                val = values[f_lab].max()
+                if ret_ixs is None:
+                    ret_ixs = np.where(f_lab & (values == val))[0][:1]
+                else:
+                    ret_ixs = np.append(ret_ixs, np.where(f_lab & (values == val))[0])
+            return points[ret_ixs], values[ret_ixs]
+
+    elif mode.lower() == "min":
+        if values is None:
+            print("values=None: mode='min' is not possible, returning None")
+            return None
+        else:
+            for q, c in enumerate(cntr):
+                f_lab = labels == q
+                val = values[f_lab].min()
+                if ret_ixs is None:
+                    ret_ixs = np.where(f_lab & (values == val))[0][:1]
+                else:
+                    ret_ixs = np.append(ret_ixs, np.where(f_lab & (values == val))[0])
+
+            return points[ret_ixs], values[ret_ixs]
