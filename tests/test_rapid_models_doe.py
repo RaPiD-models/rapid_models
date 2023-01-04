@@ -485,3 +485,14 @@ def test_kmeans_sample_values_None(lhs_2d_n50):
         doe.kmeans_sample(
             points=lhs_2d_n50, N=10, values=None, mode="min", random_state=42
         )
+
+
+def test_kmeans_sample_values_shape(lhs_2d_n50):
+    """
+    Test ValueError raised for input of ´values´ with different number of values
+    than the corresponding points.
+    """
+    with pytest.raises(ValueError):
+        doe.kmeans_sample(
+            points=lhs_2d_n50, N=10, values=[1, 2], mode="min", random_state=42
+        )

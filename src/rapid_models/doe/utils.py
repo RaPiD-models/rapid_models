@@ -131,9 +131,9 @@ def kmeans_sample(points, N, values=None, mode="center", random_state=42):
             from which to calculate N k-means clusters to use as distance
             maximizing samples in K-dimensions
         N (int): Number of clusters
-        values (array-like, 1D): Array of corresponding values at each point in
-            `points`. These values can be used to select e.g. minimum or maximum
-            values inside each cluster by specifying `mode`
+        values (array-like, 1D): Array of corresponding values at each point ´P´
+            in `points`. These values can be used to select e.g. minimum or
+            maximum values inside each cluster by specifying `mode`
         mode (str, default="center"): default mode select center of k-means
             cluster. "center_closest_point" select the point which are closest
             to the cluster center, "min" select the point with the corresponding
@@ -159,6 +159,10 @@ def kmeans_sample(points, N, values=None, mode="center", random_state=42):
         if values is None:
             raise TypeError(
                 "values=None. If mode is ´min´ or ´max´, values corresponding to the points need to be given."
+            )
+        if not np.array(values).shape[0] == np.array(points).shape[0]:
+            raise ValueError(
+                "Length of 1D array ´Values´ must match 2nd dimension of 2D array ´points´."
             )
 
     ret_ixs = None
