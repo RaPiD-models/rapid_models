@@ -23,7 +23,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join("..", "src")))
 print(sys.path)
 
-import rapid_models
+import rapid_models  # noqa: E402 (import statement after . added to sys.path)
 
 # -- General configuration ---------------------------------------------
 
