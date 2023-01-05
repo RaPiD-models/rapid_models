@@ -8,7 +8,10 @@
 
 name: Upload Python Package to test.pypi
 
-on: push
+on: 
+  push:
+    tags:
+      - v*
 #   release:
 #     types: [published]
 
