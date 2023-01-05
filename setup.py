@@ -73,7 +73,9 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/RaPiD-models/rapid_models",
-    download_url="https://github.com/RaPiD-models/rapid_models/archive/refs/tags/v0.1.4.tar.gz",
+    download_url="https://github.com/RaPiD-models/rapid_models/archive/refs/tags/v{}.tar.gz".format(
+        get_version("src/rapid_models/__init__.py")
+    ),
     version=get_version("src/rapid_models/__init__.py"),
     zip_safe=False,
 )
