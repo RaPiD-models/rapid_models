@@ -20,11 +20,10 @@
 import os
 import sys
 
-import rapid_models
-
 sys.path.insert(0, os.path.abspath(os.path.join("..", "src")))
 print(sys.path)
 
+import rapid_models
 
 # -- General configuration ---------------------------------------------
 
