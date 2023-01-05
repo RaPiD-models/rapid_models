@@ -31,6 +31,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install build
         pip install -r requirements.txt
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox
     - name: Build package
       run: python -m build
     - name: Publish package
