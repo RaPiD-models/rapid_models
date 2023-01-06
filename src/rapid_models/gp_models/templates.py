@@ -18,12 +18,14 @@ class ExactGPModel(gpytorch.models.ExactGP):
         mean_module: gpytorch.means.Mean,
         covar_module: gpytorch.kernels.Kernel,
         likelihood: gpytorch.likelihoods.Likelihood,
-        path: str = '',
-        name: str = '',
+        path: str = "",
+        name: str = "",
     ):
-        # Note: Overwriting the declaration of self.likelihood is necessary to make explicit to code linters
-        #       that likelihood is not optional in our implementation, i.e. likelihood cannot be None.
-        #       (This is different from the ExactGP base class implementation where likelihood can also be None.)
+        # Note: Overwriting the declaration of self.likelihood is necessary to
+        # make explicit to code linters that likelihood is not optional in our
+        # implementation, i.e. likelihood cannot be None. (This is different
+        # from the ExactGP base class implementation where likelihood can also
+        # be None.)
         self.likelihood: gpytorch.likelihoods.Likelihood
 
         super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
@@ -38,8 +40,9 @@ class ExactGPModel(gpytorch.models.ExactGP):
         self.mean_module = mean_module
         self.covar_module = covar_module
 
-    def forward(self,
-                x: torch.Tensor) -> gpytorch.distributions.MultivariateNormal:
+    def forward(
+        self, x: torch.Tensor
+    ) -> gpytorch.distributions.MultivariateNormal:
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
@@ -96,8 +99,11 @@ class ExactGPModel(gpytorch.models.ExactGP):
             assert isinstance(dist, gpytorch.distributions.MultivariateNormal)
             # if isinstance(dist, gpytorch.distributions.MultivariateNormal):
             mean = dist.mean.cpu()
-            var = dist.covariance_matrix.cpu(  # type: ignore
-            ) if full_cov else dist.variance.cpu()
+            var = (
+                dist.covariance_matrix.cpu()  # type: ignore
+                if full_cov
+                else dist.variance.cpu()
+            )
 
         return mean, var
 
@@ -105,20 +111,21 @@ class ExactGPModel(gpytorch.models.ExactGP):
         """
         Print actual (not raw) parameters
         """
-        _constant_mean: Union[torch.Tensor, str] = '--'
+        _constant_mean: Union[torch.Tensor, str] = "--"
         with contextlib.suppress(Exception):
             _constant_mean = self.mean_module.constant.item()  # type: ignore
 
-        _noise: Union[torch.Tensor, str] = '--'
+        _noise: Union[torch.Tensor, str] = "--"
         with contextlib.suppress(Exception):
             _noise = self.likelihood.noise_covar.noise.item()  # type: ignore
 
-        _lengthscale: Union[NDArray[Any, Any], str] = '--'
+        _lengthscale: Union[NDArray[Any, Any], str] = "--"
         with contextlib.suppress(Exception):
-            _lengthscale = self.covar_module.base_kernel.lengthscale.detach(  # type: ignore
-            ).numpy()[0]
+            _lengthscale = (
+                self.covar_module.base_kernel.lengthscale.detach().numpy()[0]
+            )
 
-        _outputscale: Union[torch.Tensor, str] = '--'
+        _outputscale: Union[torch.Tensor, str] = "--"
         with contextlib.suppress(Exception):
             _outputscale = self.covar_module.outputscale.item()  # type: ignore
 
