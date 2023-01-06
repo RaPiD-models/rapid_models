@@ -40,7 +40,7 @@ jobs:
     #     --statistics
     - name: Lint with ruff
       run: |
-        ruff src tests
+        ruff --verbose src tests
     - name: Test with tox
       # Run tox using the version of Python in `PATH`
       run: |
