@@ -1,7 +1,7 @@
 bump2version
 wheel
 watchdog
-flake8
+ruff
 black
 tox
 coverage

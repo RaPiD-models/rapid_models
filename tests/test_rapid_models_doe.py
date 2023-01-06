@@ -689,7 +689,7 @@ def test_in_hull_2(lhs_2d_n200, pts_def_circ, sample_inhull_circ):
 
 def test_kmeans_sample_N_int(pts_def_hull):
     """
-    Test TypeError raised for non-int input of ´N´
+    Test TypeError raised for non-int input of 'N'
     """
     with pytest.raises(TypeError):
         doe.kmeans_sample(
@@ -699,7 +699,7 @@ def test_kmeans_sample_N_int(pts_def_hull):
 
 def test_kmeans_sample_mode_str(pts_def_hull):
     """
-    Test TypeError raised for non-string input of ´type´
+    Test TypeError raised for non-string input of 'type'
     """
     with pytest.raises(TypeError):
         doe.kmeans_sample(
@@ -709,7 +709,7 @@ def test_kmeans_sample_mode_str(pts_def_hull):
 
 def test_kmeans_sample_mode_val(pts_def_hull):
     """
-    Test ValueError raised for input of ´type´ not supported
+    Test ValueError raised for input of 'type' not supported
     """
     with pytest.raises(ValueError):
         doe.kmeans_sample(
@@ -719,7 +719,7 @@ def test_kmeans_sample_mode_val(pts_def_hull):
 
 def test_kmeans_sample_values_None(pts_def_hull):
     """
-    Test ValueError raised for input of ´values´=None when ´type´ require values
+    Test ValueError raised for input of 'values'=None when 'type' require values
     """
     with pytest.raises(TypeError):
         doe.kmeans_sample(
@@ -729,7 +729,7 @@ def test_kmeans_sample_values_None(pts_def_hull):
 
 def test_kmeans_sample_values_shape(pts_def_hull):
     """
-    Test ValueError raised for input of ´values´ with different number of values
+    Test ValueError raised for input of 'values' with different number of values
     than the corresponding points.
     """
     with pytest.raises(ValueError):

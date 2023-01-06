@@ -8,12 +8,13 @@ from scipy.stats import norm
 
 
 def snorm_qq(
-    x: NDArray[Shape['N'], Float]  # noqa: F821
-) -> Tuple[NDArray[Shape['N'], Float],  # noqa: F821
-           NDArray[Shape['N'], Float],  # noqa: F821
-           NDArray[Shape['N'], Float],  # noqa: F821
-           NDArray[Shape['N'], Float]  # noqa: F821
-           ]:
+    x: NDArray[Shape["N"], Float]  # noqa: F821
+) -> Tuple[
+    NDArray[Shape["N"], Float],  # noqa: F821
+    NDArray[Shape["N"], Float],  # noqa: F821
+    NDArray[Shape["N"], Float],  # noqa: F821
+    NDArray[Shape["N"], Float],  # noqa: F821
+]:
     """
     Function for calculating standard normal QQ plot data with 95% confidence.
 
@@ -62,11 +63,12 @@ def snorm_qq(
 @overload
 def split_test_train_fold(
     folds: List[List[int]],
-    X: NDArray[Shape['*, ...'], Any],  # noqa: F722
+    X: NDArray[Shape["*, ..."], Any],  # noqa: F722
     i: int,
-) -> Tuple[NDArray[Shape['*, ...'], Any],  # noqa: F722
-           NDArray[Shape['*, ...'], Any]  # noqa: F722
-           ]:
+) -> Tuple[
+    NDArray[Shape["*, ..."], Any],  # noqa: F722
+    NDArray[Shape["*, ..."], Any],  # noqa: F722
+]:
     ...
 
 
@@ -81,11 +83,15 @@ def split_test_train_fold(
 
 def split_test_train_fold(
     folds: List[List[int]],
-    X: Union[NDArray[Shape['*, ...'], Any], torch.Tensor],  # noqa: F722
+    X: Union[NDArray[Shape["*, ..."], Any], torch.Tensor],  # noqa: F722
     i: int,
-) -> Union[Tuple[NDArray[Shape['*, ...'], Any],  # noqa: F722
-                 NDArray[Shape['*, ...'], Any]  # noqa: F722
-                 ], Tuple[torch.Tensor, torch.Tensor]]:
+) -> Union[
+    Tuple[
+        NDArray[Shape["*, ..."], Any],  # noqa: F722
+        NDArray[Shape["*, ..."], Any],  # noqa: F722
+    ],
+    Tuple[torch.Tensor, torch.Tensor],
+]:
     """
     Split X into X_train, X_test where
 
@@ -100,6 +106,6 @@ def split_test_train_fold(
     """
 
     idx_test = folds[i]
-    idx_train = list(itertools.chain(*(folds[:i] + folds[i + 1:])))
+    idx_train = list(itertools.chain(*(folds[:i] + folds[i + 1 :])))
 
     return X[idx_test], X[idx_train]  # type: ignore

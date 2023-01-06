@@ -7,13 +7,15 @@ from nptyping import Float, NDArray, Shape
 
 
 def triang_solve(
-    A: NDArray[Shape['N, N'], Float],  # noqa: F821
-    B: Union[NDArray[Shape['N'], Float],  # noqa: F821
-             NDArray[Shape['N, M'], Float]],  # noqa: F821
+    A: NDArray[Shape["N, N"], Float],  # noqa: F821
+    B: Union[
+        NDArray[Shape["N"], Float], NDArray[Shape["N, M"], Float]  # noqa: F821
+    ],  # noqa: F821
     lower: bool = True,
     trans: bool = False,
-) -> Union[NDArray[Shape['N'], Float],  # noqa: F821
-           NDArray[Shape['N, M'], Float]]:  # noqa: F821
+) -> Union[
+    NDArray[Shape["N"], Float], NDArray[Shape["N, M"], Float]  # noqa: F821
+]:  # noqa: F821
     """
     Wrapper for lapack dtrtrs function
     DTRTRS solves a triangular system of the form
@@ -35,20 +37,20 @@ def triang_solve(
 
     A = np.asfortranarray(A)
 
-    return lapack.dtrtrs(A,
-                         B,
-                         lower=lower_num,
-                         trans=trans_num,
-                         unitdiag=unitdiag_num)[0]
+    return lapack.dtrtrs(
+        A, B, lower=lower_num, trans=trans_num, unitdiag=unitdiag_num
+    )[0]
 
 
 def mulinv_solve(
-    F: NDArray[Shape['N, N'], Float],  # noqa: F821
-    B: Union[NDArray[Shape['N'], Float],  # noqa: F821
-             NDArray[Shape['N, M'], Float]],  # noqa: F821
+    F: NDArray[Shape["N, N"], Float],  # noqa: F821
+    B: Union[
+        NDArray[Shape["N"], Float], NDArray[Shape["N, M"], Float]  # noqa: F821
+    ],  # noqa: F821
     lower: bool = True,
-) -> Union[NDArray[Shape['N'], Float],  # noqa: F821
-           NDArray[Shape['N, M'], Float]]:  # noqa: F821
+) -> Union[
+    NDArray[Shape["N"], Float], NDArray[Shape["N, M"], Float]  # noqa: F821
+]:  # noqa: F821
     """
     Solve A*X = B where A = F*F^{T}
 
@@ -59,12 +61,14 @@ def mulinv_solve(
 
 
 def mulinv_solve_rev(
-    F: NDArray[Shape['N, N'], Float],  # noqa: F821
-    B: Union[NDArray[Shape['N'], Float],  # noqa: F821
-             NDArray[Shape['M, N'], Float]],  # noqa: F821
+    F: NDArray[Shape["N, N"], Float],  # noqa: F821
+    B: Union[
+        NDArray[Shape["N"], Float], NDArray[Shape["M, N"], Float]  # noqa: F821
+    ],  # noqa: F821
     lower: bool = True,
-) -> Union[NDArray[Shape['N'], Float],  # noqa: F821
-           NDArray[Shape['M, N'], Float]]:  # noqa: F821
+) -> Union[
+    NDArray[Shape["N"], Float], NDArray[Shape["M, N"], Float]  # noqa: F821
+]:  # noqa: F821
     """
     Reversed version of mulinv_solve
 
@@ -77,7 +81,7 @@ def mulinv_solve_rev(
 
 
 def symmetrify(
-    A: NDArray[Shape['*, *'], Float],  # noqa: F722
+    A: NDArray[Shape["*, *"], Float],  # noqa: F722
     upper: bool = False,
 ):
     """Create symmetric matrix from triangular matrix"""
@@ -89,8 +93,8 @@ def symmetrify(
 
 
 def chol_inv(
-    L: NDArray[Shape['N, N'], Float]  # noqa: F821
-) -> NDArray[Shape['N, N'], Float]:  # noqa: F821
+    L: NDArray[Shape["N, N"], Float]  # noqa: F821
+) -> NDArray[Shape["N, N"], Float]:  # noqa: F821
     """
     Return inverse of matrix A = L*L.T where L is lower triangular
     Uses LAPACK function dpotri
@@ -101,8 +105,8 @@ def chol_inv(
 
 
 def traceprod(
-        A: NDArray[Shape['N, M'], Float],  # noqa: F821
-        B: NDArray[Shape['M, N'], Float]  # noqa: F821
+    A: NDArray[Shape["N, M"], Float],  # noqa: F821
+    B: NDArray[Shape["M, N"], Float],  # noqa: F821
 ) -> float:
     """
     Calculate trace(A*B) for two matrices A and B
@@ -111,20 +115,24 @@ def traceprod(
 
 
 def try_chol(
-    K: NDArray[Shape['N, N'], Float],  # noqa: F821
-    noise_variance: float = 0.,
-    func_name: str = '',
-) -> Union[NDArray[Shape['N, N'], Float], None]:  # noqa: F821
+    K: NDArray[Shape["N, N"], Float],  # noqa: F821
+    noise_variance: float = 0.0,
+    func_name: str = "",
+) -> Union[NDArray[Shape["N, N"], Float], None]:  # noqa: F821
     """
-    Try to compute the Cholesky decomposition of (K + noise_variance*I), and print an error message if it does not work
+    Try to compute the Cholesky decomposition of (K + noise_variance*I), and
+    print an error message if it does not work
     """
     A = K + np.eye(K.shape[0]) * noise_variance
     try:
         return np.linalg.cholesky(A)
     except Exception:
         print(
-            "Could not compute numpy.linalg.cholesky(K + np.eye(K.shape[0])*noise_variance)! The matrix K is probably not positive definite.\n"
-            f"Try using {func_name}_cholesky() with alternative Cholesky factor, or add jitter by increasing noise_variance."
+            "Could not compute \
+                numpy.linalg.cholesky(K + np.eye(K.shape[0])*noise_variance)! \
+                The matrix K is probably not positive definite.\n"
+            f"Try using {func_name}_cholesky() with alternative Cholesky \
+                factor, or add jitter by increasing noise_variance."
         )
         with contextlib.suppress(Exception):
             print(f"Smallest eigenvalue: {np.linalg.eig(A)[0].min()}")

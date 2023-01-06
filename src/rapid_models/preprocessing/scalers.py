@@ -15,8 +15,7 @@ def scale_x_to_box(x, bounds):
     """
     x_tmp = x.copy()
     for i in range(x.shape[1]):
-        x_tmp[:,
-              i] = x_tmp[:, i] * (bounds[i][1] - bounds[i][0]) + bounds[i][0]
+        x_tmp[:, i] = x_tmp[:, i] * (bounds[i][1] - bounds[i][0]) + bounds[i][0]
 
     return x_tmp
 
@@ -27,17 +26,13 @@ def scale_x_to_box_inv(x, bounds):
     """
     x_tmp = x.copy()
     for i in range(x.shape[1]):
-        x_tmp[:,
-              i] = (x_tmp[:, i] - bounds[i][0]) / (bounds[i][1] - bounds[i][0])
+        x_tmp[:, i] = (x_tmp[:, i] - bounds[i][0]) / (bounds[i][1] - bounds[i][0])
     return x_tmp
 
 
-def standardScaler(x,
-                   mean=None,
-                   std=None,
-                   dim=0,
-                   tensorType="torch",
-                   bReturnParam=False):
+def standardScaler(
+    x, mean=None, std=None, dim=0, tensorType="torch", bReturnParam=False
+):
     """
     Standardize features by removing the mean and scaling to unit variance.
     The standard score of a sample $x$ is calculated as:

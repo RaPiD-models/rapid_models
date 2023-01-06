@@ -16,8 +16,8 @@ def AL_McKay92_idx(gp_std_at_lhs, nNew=1):
       gp_std_at_lhs (list-like, 1D): List or array of standard deviation
         predictions from a Gaussian process (GP) model.The sample size should be
         a suitably large Latin-hypercube sample (LHS) from the entire valid
-        input range (E.g. :math:`> 100 \\times n` where :math:`n` is the number of input
-        dimensions)
+        input range (E.g. :math:`> 100 \\times n` where :math:`n` is the number
+        of input dimensions)
       nNew (int, default=1): Number of largest values to return.
         ``nNew = 1`` will return the index of the largest value of the input,
         (decending) of the input values.
@@ -25,8 +25,10 @@ def AL_McKay92_idx(gp_std_at_lhs, nNew=1):
     Returns:
       (tuple): tuple containing:
 
-        - **idxs** _(ndarray, 1D)_: Array of indexes of the nNew largest values in the input.
-        - **Timp** _(ndarray, 1D)_: Array of improvement metrics (i.e. the nNew largest values sorted descending).
+        - **idxs** _(ndarray, 1D)_: Array of indexes of the nNew largest values
+          in the input.
+        - **Timp** _(ndarray, 1D)_: Array of improvement metrics (i.e. the nNew
+          largest values sorted descending).
 
     """
     std = gp_std_at_lhs
