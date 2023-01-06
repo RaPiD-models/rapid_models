@@ -156,6 +156,8 @@ def log_prob_normal(
     """
     Compute log probability of the data Y under an unbiased Gaussian with
     covariance L*L^T
+
+    TEST TEST ETEST ET SET SET TES SET TEST SET SETSET SET SETSETST SETSET SETSETSET SETEST SET SET
     """
     a: NDArray[Shape["N"], Float]  # noqa: F821
     a = triang_solve(L, Y)  # La = Y
