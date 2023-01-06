@@ -34,9 +34,9 @@ jobs:
       displayName: 'pytest'
     
     - script: |
-        flake8 *.py
-        flake8 src/rapid_models/*.py
-      displayName: 'Linting with flake8'
+        ruff *.py
+        ruff src/rapid_models/*.py
+      displayName: 'Linting with ruff'
 
 
   - job: Windows
@@ -62,6 +62,6 @@ jobs:
       displayName: 'pytest'
     - script: |
         call activate testenv
-        flake8 .\setup.py
-        flake8 .\src\rapid_models\
-      displayName: 'Linting with flake8'
+        ruff .\setup.py
+        ruff .\src\rapid_models\
+      displayName: 'Linting with ruff'
