@@ -58,6 +58,9 @@ setup(
         "torch>=1.10.0",
         "gpytorch>=1.6.0",
         "nptyping",
+        "plotly",
+        "ipywidgets>=7.0.0",
+        "nbformat>=4.2.0"
     ],
     license="GNU General Public License v3",
     long_description=readme + "\n\n" + history,
